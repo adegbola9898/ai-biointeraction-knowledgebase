@@ -181,3 +181,67 @@ Implement an in-memory /papers endpoint before connecting PostgreSQL
 What to say in interview
 
 “I added a simple health endpoint to verify that the backend service was running correctly and that Spring Boot was discovering REST controllers before adding database-dependent features.”
+
+
+## Sprint 2 — Paper API (In-Memory)
+
+### What did we run?
+
+Implemented:
+
+- `Paper` domain model
+- `PaperController` with:
+  - `POST /papers`
+  - `GET /papers`
+
+Tested using curl:
+
+- Created a paper via POST request
+- Retrieved papers via GET request
+
+### What did we observe?
+
+The API successfully:
+
+- Accepted JSON input
+- Generated a unique ID for each paper
+- Stored papers in memory
+- Returned stored data via GET endpoint
+
+Example response:
+
+POST:
+```json
+{
+  "id": "...",
+  "title": "TP53 interaction study",
+  "abstractText": "TP53 interacts with MDM2"
+}
+
+GET:
+
+[
+  {
+    "id": "...",
+    "title": "TP53 interaction study",
+    "abstractText": "TP53 interacts with MDM2"
+  }
+]
+What does it imply about the system?
+
+The backend can now ingest and expose paper data, representing the first step in the biocuration workflow.
+
+This establishes the entry point for literature before AI-based interaction extraction.
+
+What remains unknown?
+Persistent storage (PostgreSQL)
+Validation logic
+AI extraction integration
+Error handling and edge cases
+What’s next?
+Introduce DTOs (request/response separation)
+Add validation
+Prepare for database integration
+What to say in interview
+
+“I implemented the first domain API for papers, starting with an in-memory model to validate the ingestion workflow before introducing database persistence. This allowed me to focus on API design and data flow early.”
