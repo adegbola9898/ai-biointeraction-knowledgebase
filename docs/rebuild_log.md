@@ -69,3 +69,73 @@ Add basic Docker Compose services
 What to say in interview
 
 “I structured the repository to reflect a modular microservices architecture, separating concerns across frontend, backend, and AI services. This gives the project a clean foundation where each service can evolve independently while still supporting an integrated biocuration workflow.”
+
+## Sprint 1 — Architecture and Data Model Design
+
+### What did we run?
+
+Created:
+- docs/architecture.md
+- docs/data_model.md
+
+### What did we observe?
+
+The system now has a clearly defined structure and data representation before implementation.
+
+### What does it imply about the system?
+
+The system is designed before being built, reducing ambiguity and enabling structured development.
+
+### What remains unknown?
+
+- Exact API endpoints
+- Implementation details
+- AI extraction accuracy
+
+### What’s next?
+
+- Initialize Spring Boot backend
+- Define REST API endpoints
+- Begin database implementation
+
+### What to say in interview
+
+“I defined the system architecture and data model upfront to ensure clarity around how data flows through the system and how biological interactions are represented.”
+
+## Sprint 2 — Spring Boot Backend Initialization
+
+### What did we run?
+
+Initialized a Spring Boot backend with Maven, Java 21, Spring Web, JPA, PostgreSQL, Validation, and Lombok.
+
+### What did we observe?
+
+The first run failed because `javac` was missing. The Java runtime was installed, but the full JDK compiler was not available.
+
+After installing the full OpenJDK 21 JDK, the project compiled successfully.
+
+The second issue was Spring Boot trying to configure a PostgreSQL datasource before database settings existed. We temporarily disabled datasource and JPA auto-configuration so the backend could start cleanly.
+
+The backend successfully started on port 8080.
+
+### What does it imply about the system?
+
+The Java backend foundation is now functional. The system has a working API service layer ready for REST endpoint development.
+
+### What remains unknown?
+
+- PostgreSQL connection configuration
+- Database schema
+- Entity definitions
+- API endpoint implementation
+- Backend-to-AI service communication
+
+### What’s next?
+
+- Add a basic health endpoint
+- Create the first domain model: Paper
+- Implement the first `/papers` API
+
+### What to say in interview
+
+“I initialized the Spring Boot backend and resolved environment and datasource configuration issues. This gave the project a working Java API foundation before introducing database persistence.”
