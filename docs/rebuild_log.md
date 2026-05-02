@@ -139,3 +139,45 @@ The Java backend foundation is now functional. The system has a working API serv
 ### What to say in interview
 
 “I initialized the Spring Boot backend and resolved environment and datasource configuration issues. This gave the project a working Java API foundation before introducing database persistence.”
+
+## Sprint 2 — Backend Health Endpoint
+
+### What did we run?
+
+Created a Spring Boot REST controller:
+
+- `HealthController.java`
+- Endpoint: `GET /health`
+
+Tested with:
+
+```bash
+curl http://localhost:8080/health
+What did we observe?
+
+The first /health request returned 404 Not Found because the controller file had not been created inside the backend-java source tree.
+
+After creating the controller under:
+
+backend-java/src/main/java/com/samyus/biointeraction/controller/
+
+the endpoint returned:
+
+{"service":"biointeraction-backend","status":"UP"}
+What does it imply about the system?
+
+The backend is now exposing a working REST endpoint. This confirms that Spring Boot routing and controller discovery are working correctly.
+
+What remains unknown?
+Database-backed endpoints
+Domain models
+Persistence layer
+API validation
+Error handling
+What’s next?
+Create the Paper domain model
+Add request/response DTOs
+Implement an in-memory /papers endpoint before connecting PostgreSQL
+What to say in interview
+
+“I added a simple health endpoint to verify that the backend service was running correctly and that Spring Boot was discovering REST controllers before adding database-dependent features.”
