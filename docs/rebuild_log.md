@@ -506,3 +506,44 @@ The backend now supports a human-in-the-loop curation workflow where candidate i
 ### What to say in interview
 
 “I implemented the curation workflow by allowing extracted interactions to move from pending to approved or rejected. This mirrors the human validation step used in biological knowledgebase curation.”
+
+## Sprint 3 — FastAPI AI Extraction Service
+
+### What did we run?
+
+Created a Python FastAPI service under `ai-service-python`.
+
+Implemented:
+
+- `POST /extract`
+- request body with input text
+- mock extraction logic for EGFR-GRB2 interactions
+
+### What did we observe?
+
+Initial package installation failed because the WSL Python environment is externally managed.
+
+We resolved this by creating a virtual environment with `python3 -m venv .venv`, activating it, and installing dependencies locally.
+
+The AI service successfully returned a structured candidate interaction from input text.
+
+### What does it imply about the system?
+
+The project now has a separate AI extraction microservice that can transform literature text into structured biological interaction candidates.
+
+### What remains unknown?
+
+- Java backend integration
+- More general extraction rules
+- Error handling
+- Docker setup for the AI service
+
+### What’s next?
+
+- Call the FastAPI service from Spring Boot
+- Automatically create candidate interactions from paper abstracts
+- Add Docker support for the AI service
+
+### What to say in interview
+
+“I implemented the AI extraction layer as a separate FastAPI microservice. Even though the initial extraction is rule-based, the service boundary allows the model to be upgraded later without changing the Java backend.”
