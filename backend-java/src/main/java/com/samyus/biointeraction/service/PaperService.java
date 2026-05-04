@@ -31,19 +31,24 @@ public class PaperService {
         Paper paper = new Paper(title, abstractText);
         Paper savedPaper = paperRepository.save(paper);
 
-        Map response = aiClient.callExtractionService(abstractText);
-        List<Map> interactions = (List<Map>) response.get("interactions");
+        try {
+            Map response = aiClient.callExtractionService(abstractText);
+            List<Map> interactions = (List<Map>) response.get("interactions");
 
-        for (Map interactionData : interactions) {
-            Interaction interaction = new Interaction(
-                    (String) interactionData.get("proteinA"),
-                    (String) interactionData.get("proteinB"),
-                    (String) interactionData.get("interactionType"),
-                    (String) interactionData.get("evidenceText"),
-                    savedPaper
-            );
+            for (Map interactionData : interactions) {
+                Interaction interaction = new Interaction(
+                        (String) interactionData.get("proteinA"),
+                        (String) interactionData.get("proteinB"),
+                        (String) interactionData.get("interactionType"),
+                        (String) interactionData.get("evidenceText"),
+                        savedPaper
+                );
 
-            interactionRepository.save(interaction);
+                interactionRepository.save(interaction);
+            }
+
+        } catch (Exception e) {
+            System.out.println("AI extraction failed: " + e.getMessage());
         }
 
         return savedPaper;
