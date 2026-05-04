@@ -287,3 +287,44 @@ What to say in interview
 “I added DTO-based validation so the API enforces a clear contract at the boundary. This prevents invalid literature records from entering the curation workflow.”
 
 
+## Sprint 2 — Paper Service Layer
+
+### What did we run?
+
+Refactored the Paper API so the controller delegates business logic to `PaperService`.
+
+Implemented:
+
+- `PaperService`
+- Constructor injection into `PaperController`
+- In-memory paper storage moved from controller to service
+
+### What did we observe?
+
+The API behavior remained the same:
+
+- `POST /papers` created a paper
+- `GET /papers` returned stored papers
+
+### What does it imply about the system?
+
+The backend now has a cleaner production-style structure:
+
+```text
+Controller → Service → Storage
+
+This prepares the system for replacing in-memory storage with a repository and PostgreSQL.
+
+What remains unknown?
+PostgreSQL persistence
+Repository layer
+Entity mapping
+Database migrations
+What’s next?
+Add PostgreSQL via Docker Compose
+Re-enable datasource configuration
+Convert Paper into a JPA entity
+Add PaperRepository
+What to say in interview
+
+“I refactored the backend to use a service layer so controllers stay thin and business logic sits in a dedicated component. This prepares the codebase for adding persistence without changing the API contract.”
