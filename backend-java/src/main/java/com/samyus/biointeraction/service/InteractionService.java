@@ -1,5 +1,6 @@
 package com.samyus.biointeraction.service;
 
+import com.samyus.biointeraction.graph.Neo4jClient;
 import com.samyus.biointeraction.model.Interaction;
 import com.samyus.biointeraction.model.Paper;
 import com.samyus.biointeraction.repository.InteractionRepository;
@@ -13,10 +14,16 @@ public class InteractionService {
 
     private final InteractionRepository interactionRepository;
     private final PaperRepository paperRepository;
+    private final Neo4jClient neo4jClient;
 
-    public InteractionService(InteractionRepository interactionRepository, PaperRepository paperRepository) {
+    public InteractionService(
+            InteractionRepository interactionRepository,
+            PaperRepository paperRepository,
+            Neo4jClient neo4jClient
+    ) {
         this.interactionRepository = interactionRepository;
         this.paperRepository = paperRepository;
+        this.neo4jClient = neo4jClient;
     }
 
     public Interaction createInteraction(String proteinA, String proteinB,
@@ -45,6 +52,16 @@ public class InteractionService {
 
         interaction.setStatus(newStatus);
 
-        return interactionRepository.save(interaction);
+        Interaction saved = interactionRepository.save(interaction);
+
+        // 🔥 THIS IS THE IMPORTANT PART
+        if (newStatus == Interaction.Status.APPROVED) {
+            neo4jClient.createInteraction(
+                    saved.getProteinA(),
+                    saved.getProteinB()
+            );
+        }
+
+        return saved;
     }
 }
