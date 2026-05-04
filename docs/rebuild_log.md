@@ -245,3 +245,45 @@ Prepare for database integration
 What to say in interview
 
 “I implemented the first domain API for papers, starting with an in-memory model to validate the ingestion workflow before introducing database persistence. This allowed me to focus on API design and data flow early.”
+
+## Sprint 2 — Paper DTO and Validation
+
+### What did we run?
+
+Added a `CreatePaperRequest` DTO with validation rules:
+
+- `title` must not be blank
+- `abstractText` must not be blank
+
+Updated `PaperController` to accept a validated request body instead of a raw map.
+
+### What did we observe?
+
+A valid request successfully created a paper.
+
+An invalid request with empty fields returned:
+
+```json
+{
+  "status": 400,
+  "error": "Bad Request",
+  "path": "/papers"
+}
+What does it imply about the system?
+
+The API now has a clearer request contract and rejects invalid paper submissions before they enter the workflow.
+
+What remains unknown?
+Custom validation error response format
+Persistent storage
+Service layer separation
+PostgreSQL integration
+What’s next?
+Add a service layer for paper business logic
+Move in-memory storage out of the controller
+Prepare for PostgreSQL persistence
+What to say in interview
+
+“I added DTO-based validation so the API enforces a clear contract at the boundary. This prevents invalid literature records from entering the curation workflow.”
+
+
