@@ -547,3 +547,36 @@ The project now has a separate AI extraction microservice that can transform lit
 ### What to say in interview
 
 “I implemented the AI extraction layer as a separate FastAPI microservice. Even though the initial extraction is rule-based, the service boundary allows the model to be upgraded later without changing the Java backend.”
+
+## Sprint 3 — Backend to AI Service Integration
+
+### What did we run?
+
+Added an `AiExtractionClient` in the Spring Boot backend and updated `PaperService` so that creating a paper calls the FastAPI extraction service.
+
+### What did we observe?
+
+Creating a paper with abstract text automatically triggered AI extraction.
+
+The extracted EGFR-GRB2 interaction was stored in PostgreSQL with status `PENDING`.
+
+### What does it imply about the system?
+
+The project now has an end-to-end pipeline:
+
+```text
+Paper ingestion → AI extraction → candidate interaction storage → curation workflow
+What remains unknown?
+Failure handling when the AI service is unavailable
+More general extraction rules
+Response DTOs for cleaner API output
+Docker Compose support for running both backend and AI service
+What’s next?
+Add error handling for AI service failures
+Improve API responses
+Containerise the AI service
+What to say in interview
+
+“When a paper is ingested, the Java backend calls a FastAPI microservice to extract candidate interactions, which are automatically stored as pending curation items.”
+
+
