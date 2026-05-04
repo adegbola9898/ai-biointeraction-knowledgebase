@@ -580,3 +580,35 @@ What to say in interview
 “When a paper is ingested, the Java backend calls a FastAPI microservice to extract candidate interactions, which are automatically stored as pending curation items.”
 
 
+## Sprint 3 — AI Extraction Failure Handling
+
+### What did we run?
+
+Updated `PaperService` so AI extraction runs inside a try/catch block after paper persistence.
+
+### What did we observe?
+
+When the AI service was running, creating a paper also created a pending interaction.
+
+When the AI service was stopped, paper creation still succeeded.
+
+### What does it imply about the system?
+
+Paper ingestion is now resilient to AI service outages. The AI service can fail without breaking the core literature ingestion workflow.
+
+### What remains unknown?
+
+- Structured logging
+- Retry strategy
+- User-facing warning when extraction fails
+- Async processing with queues
+
+### What’s next?
+
+- Start Sprint 4 database enhancements
+- Add Neo4j for graph-style interaction representation
+
+### What to say in interview
+
+“I made the AI integration fault-tolerant by ensuring paper ingestion succeeds even if the extraction service is unavailable. This keeps the core workflow reliable while treating AI extraction as an enhancement layer.”
+
