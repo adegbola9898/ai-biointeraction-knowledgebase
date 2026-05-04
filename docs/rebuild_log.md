@@ -405,3 +405,65 @@ The backend now has real persistence. Paper ingestion data is stored in PostgreS
 “I replaced in-memory storage with PostgreSQL-backed persistence using JPA repositories. This moved the backend from a prototype API to a real persistence layer.”
 
 
+🧠 Why this matters (very important)
+
+You just modeled:
+
+Paper → Interaction → (status: pending/approved/rejected)
+
+That is literally the biocuration pipeline core.
+
+🎤 Interview line
+
+“I modeled interactions as first-class entities linked to papers, including a status field to support human validation workflows.”
+
+
+## Sprint 2 — Interaction API
+
+### What did we run?
+
+Added the interaction domain layer:
+
+- `Interaction` JPA entity
+- `InteractionRepository`
+- `InteractionService`
+- `CreateInteractionRequest` DTO
+- `InteractionController`
+
+Implemented endpoints:
+
+- `POST /interactions`
+- `GET /interactions`
+
+### What did we observe?
+
+The first `/interactions` request returned `404` because `InteractionController.java` had not been created under the backend source tree.
+
+After adding the controller and restarting the backend, interaction creation worked successfully.
+
+The API created an interaction linked to an existing paper and returned it with:
+
+```json
+"status": "PENDING"
+What does it imply about the system?
+
+The system now supports the core biological relationship model:
+
+Paper → Interaction
+
+Interactions are stored in PostgreSQL, linked to papers, and initialized as pending curation candidates.
+
+What remains unknown?
+Curation status update workflow
+Approval/rejection endpoints
+Better error handling for missing papers
+Response DTOs to avoid nested entity exposure
+What’s next?
+Add curation endpoints to approve or reject interactions
+Improve error handling
+Prepare for AI-generated candidate interactions
+What to say in interview
+
+“I added interactions as first-class biological entities linked to papers, with a pending status by default. This creates the foundation for a human-in-the-loop curation workflow.”
+
+
