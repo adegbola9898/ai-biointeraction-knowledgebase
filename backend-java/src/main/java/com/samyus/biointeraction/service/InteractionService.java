@@ -5,6 +5,7 @@ import com.samyus.biointeraction.model.Interaction;
 import com.samyus.biointeraction.model.Paper;
 import com.samyus.biointeraction.repository.InteractionRepository;
 import com.samyus.biointeraction.repository.PaperRepository;
+import com.samyus.biointeraction.search.SearchClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,15 +16,18 @@ public class InteractionService {
     private final InteractionRepository interactionRepository;
     private final PaperRepository paperRepository;
     private final Neo4jClient neo4jClient;
+    private final SearchClient searchClient;
 
     public InteractionService(
             InteractionRepository interactionRepository,
             PaperRepository paperRepository,
-            Neo4jClient neo4jClient
+            Neo4jClient neo4jClient,
+            SearchClient searchClient
     ) {
         this.interactionRepository = interactionRepository;
         this.paperRepository = paperRepository;
         this.neo4jClient = neo4jClient;
+        this.searchClient = searchClient;
     }
 
     public Interaction createInteraction(String proteinA, String proteinB,
@@ -36,7 +40,18 @@ public class InteractionService {
                 proteinA, proteinB, type, evidence, paper
         );
 
-        return interactionRepository.save(interaction);
+        Interaction saved = interactionRepository.save(interaction);
+
+        searchClient.indexInteraction(
+                saved.getId(),
+                saved.getProteinA(),
+                saved.getProteinB(),
+                saved.getInteractionType(),
+                saved.getEvidenceText(),
+                saved.getStatus().name()
+        );
+
+        return saved;
     }
 
     public List<Interaction> getAll() {
@@ -54,7 +69,15 @@ public class InteractionService {
 
         Interaction saved = interactionRepository.save(interaction);
 
-        // 🔥 THIS IS THE IMPORTANT PART
+        searchClient.indexInteraction(
+                saved.getId(),
+                saved.getProteinA(),
+                saved.getProteinB(),
+                saved.getInteractionType(),
+                saved.getEvidenceText(),
+                saved.getStatus().name()
+        );
+
         if (newStatus == Interaction.Status.APPROVED) {
             neo4jClient.createInteraction(
                     saved.getProteinA(),

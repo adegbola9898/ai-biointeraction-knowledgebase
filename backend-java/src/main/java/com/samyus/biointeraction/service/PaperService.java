@@ -5,6 +5,7 @@ import com.samyus.biointeraction.model.Interaction;
 import com.samyus.biointeraction.model.Paper;
 import com.samyus.biointeraction.repository.InteractionRepository;
 import com.samyus.biointeraction.repository.PaperRepository;
+import com.samyus.biointeraction.search.SearchClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,20 +17,29 @@ public class PaperService {
     private final PaperRepository paperRepository;
     private final AiExtractionClient aiClient;
     private final InteractionRepository interactionRepository;
+    private final SearchClient searchClient;
 
     public PaperService(
             PaperRepository paperRepository,
             AiExtractionClient aiClient,
-            InteractionRepository interactionRepository
+            InteractionRepository interactionRepository,
+            SearchClient searchClient
     ) {
         this.paperRepository = paperRepository;
         this.aiClient = aiClient;
         this.interactionRepository = interactionRepository;
+        this.searchClient = searchClient;
     }
 
     public Paper createPaper(String title, String abstractText) {
         Paper paper = new Paper(title, abstractText);
         Paper savedPaper = paperRepository.save(paper);
+
+        searchClient.indexPaper(
+                savedPaper.getId(),
+                savedPaper.getTitle(),
+                savedPaper.getAbstractText()
+        );
 
         try {
             Map response = aiClient.callExtractionService(abstractText);
@@ -44,7 +54,16 @@ public class PaperService {
                         savedPaper
                 );
 
-                interactionRepository.save(interaction);
+                Interaction savedInteraction = interactionRepository.save(interaction);
+
+                searchClient.indexInteraction(
+                        savedInteraction.getId(),
+                        savedInteraction.getProteinA(),
+                        savedInteraction.getProteinB(),
+                        savedInteraction.getInteractionType(),
+                        savedInteraction.getEvidenceText(),
+                        savedInteraction.getStatus().name()
+                );
             }
 
         } catch (Exception e) {
