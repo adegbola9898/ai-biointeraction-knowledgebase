@@ -727,3 +727,43 @@ What to say in interview
 “I exposed Neo4j interaction data through a graph-ready API endpoint, returning nodes and edges that can be consumed by a frontend visualization library.”
 
 
+## Sprint 4 — Elasticsearch Search Integration
+
+### What did we run?
+
+Added Elasticsearch to Docker Compose and integrated Spring Boot with Elasticsearch using HTTP requests.
+
+Implemented:
+
+- indexing papers
+- indexing interactions
+- `GET /search?q=...`
+
+### What did we observe?
+
+Creating a paper indexed both the paper and extracted interaction.
+
+Searching for `EGFR` returned both matching document types:
+
+- paper
+- interaction
+
+### What does it imply about the system?
+
+The system now supports full-text-style retrieval across literature records and molecular interactions.
+
+### What remains unknown?
+
+- Search result DTO cleanup
+- Ranking tuning
+- Reindexing existing database records
+- Production Elasticsearch configuration
+
+### What’s next?
+
+- Add Redis caching
+- Add frontend dashboard
+
+### What to say in interview
+
+“I added Elasticsearch so papers and extracted interactions are indexed for keyword search. This gives the platform a search layer separate from PostgreSQL’s transactional storage.”
