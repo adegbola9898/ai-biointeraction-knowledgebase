@@ -612,3 +612,66 @@ Paper ingestion is now resilient to AI service outages. The AI service can fail 
 
 “I made the AI integration fault-tolerant by ensuring paper ingestion succeeds even if the extraction service is unavailable. This keeps the core workflow reliable while treating AI extraction as an enhancement layer.”
 
+🧠 What you just built
+Relational DB → validated data → Graph DB
+
+That’s multi-database architecture.
+
+🎤 Interview line (VERY strong)
+
+“I used PostgreSQL for transactional storage and Neo4j to represent approved biological interactions as a graph, enabling relationship-based queries.”
+
+
+🎤 Interview understanding
+
+You can now say:
+
+“When an interaction is approved, I propagate it into Neo4j to build a graph representation of biological relationships.”
+
+
+🧠 Why this happened (important)
+
+This is a classic integration mistake:
+
+Use class ❌ before defining it
+🎤 Interview-level explanation
+
+You can say:
+
+“I encountered a compilation failure due to a missing Neo4j client class and resolved it by correctly structuring the graph integration layer.”
+
+
+## Sprint 4 — Neo4j Graph Integration
+
+### What did we run?
+
+Added Neo4j to Docker Compose and integrated the Java backend with Neo4j using the Neo4j Java Driver.
+
+Updated the approval workflow so that approved interactions are also written to Neo4j as graph relationships.
+
+### What did we observe?
+
+Neo4j initially failed to start because the password was too short. After updating the password to meet Neo4j requirements, the container started successfully.
+
+Approving an interaction updated PostgreSQL and created graph data in Neo4j.
+
+### What does it imply about the system?
+
+The system now uses PostgreSQL for transactional storage and Neo4j for graph representation of approved biological interactions.
+
+### What remains unknown?
+
+- How graph data should be queried through the API
+- Whether rejected interactions should be removed from Neo4j
+- Graph sync consistency strategy
+- Full graph visualization frontend
+
+### What’s next?
+
+- Add a backend endpoint for approved interaction graph data
+- Add Elasticsearch for search
+- Later connect graph data to frontend visualization
+
+### What to say in interview
+
+“I extended the system with Neo4j so approved interactions are represented as protein interaction graphs. PostgreSQL remains the source of curated records, while Neo4j supports relationship-oriented querying.”
