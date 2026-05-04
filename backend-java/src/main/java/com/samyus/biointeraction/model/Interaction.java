@@ -50,4 +50,8 @@ public class Interaction {
     public String getEvidenceText() { return evidenceText; }
     public Status getStatus() { return status; }
     public Paper getPaper() { return paper; }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

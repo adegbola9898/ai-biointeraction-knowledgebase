@@ -35,4 +35,16 @@ public class InteractionService {
     public List<Interaction> getAll() {
         return interactionRepository.findAll();
     }
+
+    public Interaction updateStatus(String id, String status) {
+
+        Interaction interaction = interactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Interaction not found"));
+
+        Interaction.Status newStatus = Interaction.Status.valueOf(status.toUpperCase());
+
+        interaction.setStatus(newStatus);
+
+        return interactionRepository.save(interaction);
+    }
 }
