@@ -328,3 +328,80 @@ Add PaperRepository
 What to say in interview
 
 “I refactored the backend to use a service layer so controllers stay thin and business logic sits in a dedicated component. This prepares the codebase for adding persistence without changing the API contract.”
+
+
+🎤 Interview line
+
+“I introduced PostgreSQL using Docker and configured Spring Boot to manage schema updates automatically using JPA.”
+
+🧠 What just happened (important learning)
+
+You hit a real-world integration issue:
+
+“Application configured correctly, infrastructure missing”
+
+This is exactly the kind of thing backend engineers debug daily.
+
+🎤 Interview-level explanation
+
+You can now say:
+
+“When integrating PostgreSQL, I encountered a connection failure because the database container wasn’t running. I verified the infrastructure layer using Docker and resolved it before continuing backend integration.”
+
+That’s very strong signal.
+
+
+🧠 What you’ve achieved
+
+You now have:
+
+Spring Boot API + PostgreSQL (Docker) working together
+
+That’s already above average interview level.
+
+🎤 Interview-level explanation
+
+Say this:
+
+“I containerised PostgreSQL using Docker and configured Spring Boot to connect via JDBC. After resolving initial connection issues, I verified the integration through successful datasource initialization.”
+
+That’s clean, confident, and technical.
+
+## Sprint 2 — PostgreSQL Persistence for Papers
+
+### What did we run?
+
+Added PostgreSQL using Docker Compose and configured Spring Boot JDBC/JPA settings.
+
+Converted `Paper` into a JPA entity, added `PaperRepository`, and updated `PaperService` to persist records through PostgreSQL.
+
+### What did we observe?
+
+PostgreSQL started successfully in Docker.
+
+Spring Boot connected to the database through HikariCP.
+
+Hibernate created the `papers` table and inserted paper records successfully.
+
+### What does it imply about the system?
+
+The backend now has real persistence. Paper ingestion data is stored in PostgreSQL instead of memory.
+
+### What remains unknown?
+
+- Full schema for interactions and curation tasks
+- Migration strategy
+- Relationship mapping between papers and interactions
+- Production database configuration
+
+### What’s next?
+
+- Add `Interaction` model
+- Link interactions to papers
+- Build the first curation workflow fields
+
+### What to say in interview
+
+“I replaced in-memory storage with PostgreSQL-backed persistence using JPA repositories. This moved the backend from a prototype API to a real persistence layer.”
+
+
