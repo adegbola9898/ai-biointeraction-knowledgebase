@@ -675,3 +675,55 @@ The system now uses PostgreSQL for transactional storage and Neo4j for graph rep
 ### What to say in interview
 
 “I extended the system with Neo4j so approved interactions are represented as protein interaction graphs. PostgreSQL remains the source of curated records, while Neo4j supports relationship-oriented querying.”
+
+
+Great. Sprint 4 Neo4j is done.
+
+Next best step: add an API endpoint to expose graph-ready data before Elasticsearch.
+
+This gives you something useful for the future frontend graph visualization:
+
+GET /graph/interactions
+
+Interview line:
+
+“After syncing approved interactions to Neo4j, I exposed graph-style interaction data through the backend so the frontend can visualize protein networks.”
+
+
+## Sprint 4 — Graph Interactions API
+
+### What did we run?
+
+Added `GET /graph/interactions` to expose approved Neo4j interaction data as graph-ready JSON.
+
+### What did we observe?
+
+The endpoint returned nodes and edges:
+
+```json
+{
+  "nodes": [
+    {"id": "GRB2", "label": "GRB2"},
+    {"id": "EGFR", "label": "EGFR"}
+  ],
+  "edges": [
+    {"source": "EGFR", "target": "GRB2", "type": "INTERACTS_WITH"}
+  ]
+}
+What does it imply about the system?
+
+The backend can now provide graph data suitable for frontend network visualization.
+
+What remains unknown?
+Frontend graph library integration
+Filtering graph data
+Larger graph performance
+Relationship metadata
+What’s next?
+Add Elasticsearch for search
+Later use this endpoint for graph visualization
+What to say in interview
+
+“I exposed Neo4j interaction data through a graph-ready API endpoint, returning nodes and edges that can be consumed by a frontend visualization library.”
+
+
