@@ -467,3 +467,42 @@ What to say in interview
 “I added interactions as first-class biological entities linked to papers, with a pending status by default. This creates the foundation for a human-in-the-loop curation workflow.”
 
 
+## Sprint 2 — Interaction Curation Workflow
+
+### What did we run?
+
+Added support for updating interaction curation status.
+
+Implemented:
+
+- `UpdateInteractionStatusRequest`
+- `PATCH /interactions/{id}/status`
+- status update logic in `InteractionService`
+- `setStatus` method on `Interaction`
+
+### What did we observe?
+
+An interaction initially stored as `PENDING` was successfully updated to `APPROVED`.
+
+A failed request occurred when using the placeholder `YOUR_ID` instead of a real interaction ID. Retrying with the actual UUID resolved the issue.
+
+### What does it imply about the system?
+
+The backend now supports a human-in-the-loop curation workflow where candidate interactions can be approved or rejected.
+
+### What remains unknown?
+
+- Custom error handling for missing IDs
+- Curator identity tracking
+- Timestamped curation decisions
+- Separate `CurationTask` entity
+
+### What’s next?
+
+- Add better error handling
+- Add AI extraction service using FastAPI
+- Connect paper ingestion to candidate interaction generation
+
+### What to say in interview
+
+“I implemented the curation workflow by allowing extracted interactions to move from pending to approved or rejected. This mirrors the human validation step used in biological knowledgebase curation.”
