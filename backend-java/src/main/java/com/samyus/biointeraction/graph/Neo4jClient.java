@@ -29,6 +29,10 @@ public class Neo4jClient implements AutoCloseable {
         }
     }
 
+    public Driver getDriver() {
+        return driver;
+    }
+
     @Override
     public void close() {
         driver.close();
