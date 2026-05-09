@@ -1771,3 +1771,60 @@ Begin deployment preparation
 Interview Talking Point
 
 “I integrated Cytoscape-based graph visualization into the React frontend to render Neo4j-backed biological interaction networks and resolved real-world TypeScript and visualization library integration issues.”
+
+## Runtime Environment Snapshot
+
+Validated working environment before switching machines:
+
+- Node.js: v22.22.2
+- npm: 10.9.7
+- Java: 21
+- Docker Compose infrastructure:
+  - PostgreSQL 15
+  - Elasticsearch 8.13.4
+  - Neo4j 5
+
+Frontend runtime reproducibility support added via:
+
+```text
+frontend/.nvmrc
+
+## Runtime Environment Snapshot
+
+Validated working development environment before multi-machine continuation:
+
+```text
+Node.js        v22.22.2
+npm            10.9.7
+Java           21.0.10
+Docker         29.4.3
+Docker Compose v5.1.3
+Python         3.12.3
+Git            2.43.0
+
+Dockerized infrastructure validated:
+
+PostgreSQL 15
+Elasticsearch 8.13.4
+Neo4j 5
+
+Frontend runtime reproducibility support added via:
+
+frontend/.nvmrc
+
+Current canonical workflow direction:
+
+paper ingestion
+→ AI extraction
+→ human validation
+→ graph evolution
+→ searchable biological knowledge
+
+Next planned milestone:
+
+EPIC 6 — Paper Ingestion to Curation Workflow
+
+Then finalize:
+
+```bash id="jlwmhr"
+echo "22" > frontend/.nvmrc
