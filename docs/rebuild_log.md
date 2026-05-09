@@ -891,3 +891,97 @@ Interview Talking Point
 “I extended the platform with a React and TypeScript frontend initialized using Vite to provide a typed client layer for interacting with backend biointeraction APIs.”
 
 
+## Sprint 5A — Typed API Layer Foundation
+
+### What did we implement?
+
+Established the initial typed frontend API communication layer.
+
+Added:
+
+- centralized Axios client
+- environment-based API configuration
+- typed Paper model
+- typed Interaction model
+- reusable API request functions
+
+Created:
+
+```text
+src/api/client.ts
+src/api/papers.ts
+src/api/interactions.ts
+src/types/paper.ts
+src/types/interaction.ts
+Environment Configuration
+
+Added frontend environment configuration support:
+
+.env.example
+
+Configured:
+
+VITE_API_BASE_URL=http://localhost:8080
+What did we observe?
+
+Frontend TypeScript compilation and production build completed successfully after introducing typed API modules.
+
+Validated with:
+
+npm run build
+
+Build completed successfully using:
+
+Vite
+React
+TypeScript
+Axios
+Additional Engineering Observation
+
+Initially attempted to create frontend source files from the repository root instead of the frontend project root.
+
+This produced:
+
+No such file or directory
+
+The issue was caused by executing commands from:
+
+~/ai-biointeraction-knowledgebase
+
+instead of:
+
+~/ai-biointeraction-knowledgebase/frontend
+What does it imply about the system?
+
+The project is now operating as a multi-service repository with distinct execution contexts:
+
+backend-java/
+ai-service-python/
+frontend/
+
+This requires careful path and working-directory awareness during development workflows.
+
+Security / Reproducibility Improvement
+
+Detected that .env had accidentally been committed to Git.
+
+Resolved by:
+
+adding .env to .gitignore
+removing tracked .env from Git history moving forward
+preserving .env.example for reproducible onboarding
+What remains unknown?
+live backend API connectivity
+frontend routing structure
+dashboard rendering
+React component hierarchy
+search integration
+graph visualization integration
+What’s next?
+Add React Router configuration
+Create dashboard pages
+Connect frontend to live backend endpoints
+Render backend data in the UI
+Interview Talking Point
+
+“I established a typed frontend API layer with reusable Axios clients, environment-based configuration, and TypeScript domain models while ensuring reproducible environment configuration and clean Git hygiene.”
