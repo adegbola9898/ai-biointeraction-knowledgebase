@@ -1594,3 +1594,58 @@ Add interaction approval controls
 Interview Talking Point
 
 “I integrated the frontend search experience with Elasticsearch-backed APIs and debugged real distributed-system indexing issues involving missing search indices and persistence/search synchronization.”
+
+## Sprint 5D — Graph Visualization Dependency and API Foundation
+
+### What did we implement?
+
+Prepared the frontend for graph visualization by installing Cytoscape dependencies and adding typed graph API access.
+
+Installed:
+
+```text
+cytoscape
+react-cytoscapejs
+
+Created:
+
+frontend/src/types/graph.ts
+frontend/src/api/graph.ts
+What did we observe?
+
+The backend graph endpoint was already live:
+
+curl http://localhost:8080/graph/interactions
+
+It returned graph-ready data:
+
+{
+  "nodes": [
+    {"id": "GRB2", "label": "GRB2"},
+    {"id": "EGFR", "label": "EGFR"}
+  ],
+  "edges": [
+    {"source": "EGFR", "type": "INTERACTS_WITH", "target": "GRB2"}
+  ]
+}
+Validation
+
+Validated frontend build successfully:
+
+npm run build
+What does it imply about the system?
+
+The frontend is now prepared to consume Neo4j-backed graph data and render biological interaction networks visually.
+
+What remains unknown?
+Cytoscape component rendering
+graph layout configuration
+graph styling
+node/edge interaction behavior
+What’s next?
+Create Cytoscape graph component
+Render backend graph data in the Graph dashboard
+Validate browser visualization
+Interview Talking Point
+
+“I prepared the frontend graph layer by installing Cytoscape and adding typed API access to backend graph-ready Neo4j interaction data.”
