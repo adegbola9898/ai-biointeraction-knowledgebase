@@ -1343,3 +1343,48 @@ Interview Talking Point
 “I integrated the React frontend with live Spring Boot APIs and resolved real-world CORS issues to enable full-stack rendering of PostgreSQL-backed biological interaction data.”
 
 
+## Sprint 5B — Live Interactions Dashboard Integration
+
+### What did we implement?
+
+Connected the React Interactions dashboard to the live Spring Boot backend API.
+
+Updated:
+
+```text
+frontend/src/pages/InteractionsPage.tsx
+
+The dashboard now renders:
+
+interaction ID
+protein A
+protein B
+interaction type
+curation status
+What did we observe?
+
+The frontend successfully fetched and rendered persisted interaction records from:
+
+GET /interactions
+
+Validated interaction statuses included:
+
+PENDING
+APPROVED
+What does it imply about the system?
+
+The frontend now exposes the AI-assisted curation workflow to users by displaying extracted biological interactions and their review status.
+
+What remains unknown?
+frontend status update controls
+reusable table components
+filtering by status
+visual styling for curation state
+What’s next?
+Add curation controls for approving/rejecting interactions
+Improve dashboard layout and readability
+Add reusable loading/error/table patterns
+Interview Talking Point
+
+“I connected the frontend interaction dashboard to live backend APIs so AI-generated molecular interactions and curation statuses are visible through the user interface.”
+
