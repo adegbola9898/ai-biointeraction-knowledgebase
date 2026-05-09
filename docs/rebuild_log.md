@@ -767,3 +767,127 @@ The system now supports full-text-style retrieval across literature records and 
 ### What to say in interview
 
 “I added Elasticsearch so papers and extracted interactions are indexed for keyword search. This gives the platform a search layer separate from PostgreSQL’s transactional storage.”
+
+
+
+## Sprint 5A — Frontend Environment Setup
+
+### What did we run?
+
+Attempted to initialize a Vite React TypeScript frontend:
+
+```bash
+npm create vite@latest . -- --template react-ts
+What did we observe?
+
+Frontend initialization failed due to a Node.js runtime compatibility issue.
+
+The default Ubuntu package manager installed:
+
+Node.js v18.19.1
+npm 9.2.0
+
+However, the latest Vite scaffolding tooling required:
+
+Node.js ^20.19.0 || >=22.12.0
+
+The initialization process failed with:
+
+SyntaxError:
+The requested module 'node:util'
+does not provide an export named 'styleText'
+What does it imply about the system?
+
+Modern frontend tooling ecosystems evolve faster than default Linux distribution package repositories.
+
+Using Ubuntu’s default Node.js packages introduced compatibility issues with current frontend tooling.
+
+Resolution
+
+Removed Ubuntu-managed Node.js/npm packages and installed a modern Node.js runtime using NodeSource:
+
+sudo apt remove -y nodejs npm
+
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+
+sudo apt install -y nodejs
+
+Validated installation:
+
+node -v
+# v22.22.2
+
+npm -v
+# 10.9.7
+What remains unknown?
+Vite initialization success
+Frontend dependency installation
+Local development server validation
+What’s next?
+Initialize React + TypeScript frontend
+Install frontend dependencies
+Validate Vite development server startup
+Interview Talking Point
+
+“I resolved frontend tooling compatibility issues by upgrading the Node.js runtime to a version compatible with the modern Vite ecosystem rather than relying on outdated distro-managed packages.”
+
+
+## Sprint 5A — React + TypeScript Frontend Initialization
+
+### What did we run?
+
+Initialized a Vite React TypeScript frontend inside the existing `frontend/` directory:
+
+```bash
+npm create vite@latest . -- --template react-ts
+
+The Vite scaffolding process:
+
+generated React + TypeScript project structure
+installed frontend dependencies
+automatically started the development server
+What did we observe?
+
+Frontend initialization completed successfully.
+
+Vite development server started successfully:
+
+VITE v8.0.11 ready
+
+Local:
+http://localhost:5173/
+
+Installed dependencies included:
+
+React
+React DOM
+TypeScript
+Vite
+What does it imply about the system?
+
+The platform now contains a dedicated typed frontend application capable of consuming backend APIs and supporting future dashboard visualization features.
+
+The frontend environment is now operational for:
+
+API integration
+routing
+graph visualization
+search interfaces
+dashboard rendering
+What remains unknown?
+browser rendering validation
+frontend-to-backend API connectivity
+routing structure
+state management approach
+Cytoscape integration
+What’s next?
+Validate browser rendering
+Inspect generated project structure
+Add routing support
+Establish frontend architecture conventions
+Configure API communication layer
+Interview Talking Point
+
+“I extended the platform with a React and TypeScript frontend initialized using Vite to provide a typed client layer for interacting with backend biointeraction APIs.”
+
+
