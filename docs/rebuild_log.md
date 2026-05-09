@@ -985,3 +985,81 @@ Render backend data in the UI
 Interview Talking Point
 
 “I established a typed frontend API layer with reusable Axios clients, environment-based configuration, and TypeScript domain models while ensuring reproducible environment configuration and clean Git hygiene.”
+
+## Sprint 5A — Frontend Routing Foundation
+
+### What did we implement?
+
+Established the frontend routing and page architecture using React Router.
+
+Created:
+
+```text
+src/routes/AppRoutes.tsx
+
+Added page-level dashboard placeholders:
+
+src/pages/PapersPage.tsx
+src/pages/InteractionsPage.tsx
+src/pages/SearchPage.tsx
+src/pages/GraphPage.tsx
+
+Updated:
+
+src/App.tsx
+src/main.tsx
+What did we observe?
+
+Successfully integrated React Router into the frontend application.
+
+Configured routes:
+
+/papers
+/interactions
+/search
+/graph
+
+Validated:
+
+navigation rendering
+route switching
+page rendering
+TypeScript compilation
+Vite production build
+Validation
+
+Validated production build successfully:
+
+npm run build
+
+Validated browser navigation successfully through the Vite development server.
+
+What does it imply about the system?
+
+The frontend now has a scalable page-oriented application structure capable of supporting:
+
+dashboard rendering
+API-backed pages
+graph visualization pages
+search workflows
+future authenticated navigation
+Additional Engineering Observation
+
+The frontend application is transitioning from scaffold-generated starter content into domain-oriented application architecture.
+
+Routing separation now exists independently from component rendering logic.
+
+What remains unknown?
+live backend API rendering
+loading/error handling patterns
+reusable UI components
+graph visualization integration
+search result normalization
+What’s next?
+Connect Papers dashboard to live backend APIs
+Render backend paper data dynamically
+Add loading/error state handling
+Establish reusable dashboard components
+Interview Talking Point
+
+“I established scalable frontend routing architecture using React Router to separate dashboard domains into independently navigable frontend modules.”
