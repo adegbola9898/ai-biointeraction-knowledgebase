@@ -1063,3 +1063,283 @@ Establish reusable dashboard components
 Interview Talking Point
 
 “I established scalable frontend routing architecture using React Router to separate dashboard domains into independently navigable frontend modules.”
+
+
+
+## Infrastructure observation
+
+docker compose up -d only starts infrastructure containers:
+
+PostgreSQL
+Elasticsearch
+Neo4j
+
+NOT:
+
+Spring Boot backend
+
+Meaning our current architecture is:
+
+dockerized infrastructure
++
+locally executed backend application
+
+That absolutely should be documented because cloud deployment strategy will eventually need:
+
+backend containerization
+compose/service orchestration
+environment standardization
+Hibernate observation
+
+We also surfaced useful production warnings:
+
+PostgreSQLDialect does not need to be specified explicitly
+
+and:
+
+spring.jpa.open-in-view is enabled by default
+
+
+
+Should Docker Compose eventually start the backend too?
+
+Yes — probably.
+
+For a mature reproducible platform, the eventual ideal state is usually:
+
+docker compose up
+
+starts:
+
+PostgreSQL
+Spring Boot backend
+FastAPI AI service
+Elasticsearch
+Neo4j
+maybe frontend later
+
+That gives:
+- reproducibility
+- onboarding simplicity
+- environment consistency
+- CI/CD friendliness
+- cloud portability
+
+BUT—
+
+you are also correct that:
+
+```text
+reproducibility/containerization
+≠
+CI/CD
+
+They are related, but different layers.
+
+Current State (Totally Fine)
+
+Right now your architecture is effectively:
+
+dockerized infrastructure
++
+locally executed application services
+
+This is VERY common during active development because:
+
+hot reload is easier
+debugging is easier
+iteration is faster
+container rebuild loops are avoided
+
+So your current approach is actually reasonable for this phase.
+
+Likely Future Evolution
+
+Later you will probably evolve toward:
+
+Phase 1 — Current
+infra in Docker
+apps local
+Phase 2
+backend containerized
+infra containerized
+frontend local
+Phase 3
+full stack containerized
+Phase 4
+CI/CD pipelines
+deployment automation
+cloud orchestration
+Frontend Containerization?
+
+Probably later, yes.
+
+But not urgent now.
+
+During active frontend development:
+
+npm run dev
+
+is usually preferable because:
+
+hot reload
+debugging
+rapid iteration
+
+Later:
+
+production frontend build
+Nginx/static hosting
+Vercel/Netlify
+Docker image
+Kubernetes/etc
+
+
+
+## Sprint 5B — Live Papers Dashboard Integration
+
+### What did we implement?
+
+Connected the React frontend Papers dashboard to the live Spring Boot backend API.
+
+Updated:
+
+```text
+frontend/src/pages/PapersPage.tsx
+
+The frontend now:
+
+fetches live paper records from /papers
+renders backend data dynamically
+displays loading and error states
+renders data in a tabular dashboard view
+What did we observe?
+
+Initial frontend API requests failed despite the backend endpoint functioning correctly through curl.
+
+Frontend displayed:
+
+Failed to load papers
+
+Backend endpoint validation succeeded independently:
+
+curl http://localhost:8080/papers
+
+This indicated:
+
+backend availability was functional
+frontend API integration path existed
+browser-based requests were being blocked
+Root Cause
+
+The issue was caused by Cross-Origin Resource Sharing (CORS) restrictions.
+
+The frontend application was served from:
+
+http://localhost:5173
+
+while the backend API was served from:
+
+http://localhost:8080
+
+Browser security policies blocked cross-origin frontend requests.
+
+Resolution
+
+Added a global Spring Boot CORS configuration:
+
+backend-java/src/main/java/com/samyus/biointeraction/config/CorsConfig.java
+
+Configured allowed origins:
+
+http://localhost:5173
+
+Allowed methods:
+
+GET
+POST
+PATCH
+PUT
+DELETE
+OPTIONS
+Validation
+
+Validated frontend-to-backend integration successfully.
+
+The frontend dashboard now renders live PostgreSQL-backed paper data through the Spring Boot API.
+
+Validated:
+
+React frontend
+→ Axios API client
+→ Spring Boot backend
+→ PostgreSQL persistence
+→ Browser rendering
+
+Rendered live paper records including:
+
+EGFR study
+EGFR signaling
+AI extraction test papers
+Additional Infrastructure Observation
+
+Current architecture behavior:
+
+docker compose up -d
+
+starts infrastructure services only:
+
+PostgreSQL
+Elasticsearch
+Neo4j
+
+The Spring Boot backend currently runs separately through:
+
+./mvnw spring-boot:run
+
+This is an important future deployment consideration for:
+
+backend containerization
+orchestration
+cloud deployment reproducibility
+Additional Backend Observations
+
+Spring Boot startup surfaced production-hardening warnings:
+
+PostgreSQLDialect does not need to be specified explicitly
+
+and:
+
+spring.jpa.open-in-view is enabled by default
+
+These represent future backend cleanup and optimization opportunities.
+
+What does it imply about the system?
+
+The platform now supports true full-stack data flow:
+
+persisted backend data
+→ REST API exposure
+→ frontend API consumption
+→ browser visualization
+
+The project has transitioned from isolated backend/frontend components into an integrated application platform.
+
+What remains unknown?
+interaction dashboard rendering
+search integration
+graph visualization rendering
+reusable UI component strategy
+frontend styling system
+deployment integration
+What’s next?
+Connect interactions dashboard
+Add reusable dashboard table components
+Add search integration
+Improve frontend styling/layout
+Begin graph visualization integration
+Interview Talking Point
+
+“I integrated the React frontend with live Spring Boot APIs and resolved real-world CORS issues to enable full-stack rendering of PostgreSQL-backed biological interaction data.”
+
+
