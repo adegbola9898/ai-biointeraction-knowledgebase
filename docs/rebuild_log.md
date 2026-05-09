@@ -1467,3 +1467,130 @@ Add interaction curation controls
 Interview Talking Point
 
 “I refactored duplicated frontend loading and error handling into reusable React components to improve maintainability as the dashboard architecture expanded.”
+
+## Sprint 5C — Frontend Search Integration
+
+### What did we implement?
+
+Connected the React frontend search interface to the backend Elasticsearch-powered search API.
+
+Created:
+
+```text
+frontend/src/types/search.ts
+frontend/src/api/search.ts
+
+Updated:
+
+frontend/src/pages/SearchPage.tsx
+
+The frontend search interface now:
+
+accepts user search queries
+calls the backend /search endpoint
+renders Elasticsearch-backed search results dynamically
+displays loading and error states
+What did we observe?
+
+Initial search requests failed with:
+
+500 Internal Server Error
+
+Backend stack traces revealed:
+
+index_not_found_exception
+no such index [biointeraction-docs]
+Root Cause
+
+Elasticsearch itself was operational, but no search index had yet been created.
+
+Validated:
+
+curl http://localhost:9200
+
+returned healthy Elasticsearch cluster information.
+
+However:
+
+curl "http://localhost:9200/_cat/indices?v"
+
+returned no indices.
+
+Additional Architectural Observation
+
+The platform currently separates:
+
+PostgreSQL persistence
+≠
+Elasticsearch indexing
+
+Existing PostgreSQL records were not automatically backfilled into Elasticsearch.
+
+Search indexing only occurred when new records were created through application workflows.
+
+Resolution
+
+Created a new paper through:
+
+POST /papers
+
+This triggered:
+
+searchClient.indexPaper(...)
+
+which automatically created the Elasticsearch index:
+
+biointeraction-docs
+
+Search functionality then began operating successfully.
+
+Validation
+
+Validated successfully:
+
+POST /papers
+→ PostgreSQL persistence
+→ Elasticsearch indexing
+→ /search?q=AKT1
+→ frontend search rendering
+
+Frontend search results successfully rendered:
+
+AKT1 signaling study
+
+including indexed abstract data from Elasticsearch.
+
+What does it imply about the system?
+
+The platform now supports interactive search workflows across indexed biological knowledge.
+
+The frontend is now connected to:
+
+React frontend
+→ Spring Boot search API
+→ Elasticsearch
+→ indexed biological documents
+Additional Engineering Observation
+
+The platform currently lacks:
+
+automatic Elasticsearch backfill
+reindexing jobs
+index bootstrap initialization
+
+These represent future search reliability and operational improvements.
+
+What remains unknown?
+interaction search rendering
+structured result cards
+search filtering
+search ranking tuning
+graph-search integration
+What’s next?
+Improve search result presentation
+Separate paper vs interaction rendering
+Add graph visualization integration
+Add interaction approval controls
+Interview Talking Point
+
+“I integrated the frontend search experience with Elasticsearch-backed APIs and debugged real distributed-system indexing issues involving missing search indices and persistence/search synchronization.”
