@@ -1649,3 +1649,125 @@ Validate browser visualization
 Interview Talking Point
 
 “I prepared the frontend graph layer by installing Cytoscape and adding typed API access to backend graph-ready Neo4j interaction data.”
+
+## Sprint 5D — Cytoscape Graph Visualization Integration
+
+### What did we implement?
+
+Integrated Cytoscape graph visualization into the React frontend dashboard.
+
+Updated:
+
+```text
+frontend/src/pages/GraphPage.tsx
+
+Installed:
+
+cytoscape
+react-cytoscapejs
+@types/react-cytoscapejs
+
+The frontend graph dashboard now:
+
+fetches graph data from /graph/interactions
+transforms backend graph data into Cytoscape elements
+renders biological interaction networks visually
+displays nodes and interaction edges dynamically
+What did we observe?
+
+The backend graph endpoint returned graph-ready Neo4j-backed interaction data:
+
+{
+  "nodes": [
+    {"id": "GRB2", "label": "GRB2"},
+    {"id": "EGFR", "label": "EGFR"}
+  ],
+  "edges": [
+    {
+      "source": "EGFR",
+      "target": "GRB2",
+      "type": "INTERACTS_WITH"
+    }
+  ]
+}
+Integration Challenges
+TypeScript Declaration Issue
+
+Initial build failed because:
+
+react-cytoscapejs
+
+did not include bundled TypeScript declarations.
+
+Resolution:
+
+npm install -D @types/react-cytoscapejs
+Cytoscape Style Typing Issue
+
+TypeScript validation rejected camelCase Cytoscape style properties:
+
+curveStyle
+targetArrowShape
+
+Resolution:
+converted Cytoscape stylesheet keys to their expected hyphenated form:
+
+curve-style
+target-arrow-shape
+Validation
+
+Validated successfully with:
+
+npm run build
+
+Browser validation confirmed:
+
+graph rendering
+node labels
+interaction edge rendering
+Cytoscape layout execution
+
+Rendered graph included:
+
+EGFR
+GRB2
+INTERACTS_WITH
+Additional Engineering Observation
+
+Frontend production build surfaced a bundle-size warning after adding Cytoscape:
+
+Some chunks are larger than 500 kB after minification
+
+This indicates future optimization opportunities involving:
+
+code splitting
+lazy loading
+graph-page chunk isolation
+What does it imply about the system?
+
+The platform now supports end-to-end graph visualization:
+
+Neo4j graph data
+→ Spring Boot graph API
+→ React frontend
+→ Cytoscape rendering
+→ interactive biological network visualization
+
+The application has transitioned beyond traditional CRUD interfaces into visual biointeraction exploration.
+
+What remains unknown?
+advanced graph styling
+zoom/pan controls
+graph filtering
+node selection interactions
+large-graph performance
+graph search integration
+What’s next?
+Improve graph styling/layout
+Add graph interactivity
+Add interaction approval controls
+Improve dashboard styling system
+Begin deployment preparation
+Interview Talking Point
+
+“I integrated Cytoscape-based graph visualization into the React frontend to render Neo4j-backed biological interaction networks and resolved real-world TypeScript and visualization library integration issues.”
