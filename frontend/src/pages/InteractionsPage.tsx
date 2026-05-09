@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getInteractions } from "../api/interactions";
+import ErrorMessage from "../components/ErrorMessage";
+import LoadingMessage from "../components/LoadingMessage";
 import type { Interaction } from "../types/interaction";
 
 export default function InteractionsPage() {
@@ -23,11 +25,11 @@ export default function InteractionsPage() {
   }, []);
 
   if (loading) {
-    return <p>Loading interactions...</p>;
+    return <LoadingMessage message="Loading interactions..." />;
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <ErrorMessage message={error} />;
   }
 
   return (

@@ -1388,3 +1388,82 @@ Interview Talking Point
 
 “I connected the frontend interaction dashboard to live backend APIs so AI-generated molecular interactions and curation statuses are visible through the user interface.”
 
+## Sprint 5B — Reusable Frontend Status Components
+
+### What did we implement?
+
+Introduced reusable frontend UI components for shared loading and error state rendering.
+
+Created:
+
+```text
+frontend/src/components/LoadingMessage.tsx
+frontend/src/components/ErrorMessage.tsx
+
+Refactored:
+
+frontend/src/pages/PapersPage.tsx
+frontend/src/pages/InteractionsPage.tsx
+What did we observe?
+
+Both dashboard pages previously duplicated:
+
+loading state rendering
+error state rendering
+
+The duplication was small initially, but would become increasingly difficult to maintain as additional pages and API integrations were added.
+
+Resolution
+
+Centralized shared UI state rendering into reusable React components.
+
+The dashboard pages now reuse:
+
+LoadingMessage
+ErrorMessage
+
+instead of implementing inline loading/error rendering independently.
+
+Validation
+
+Validated successfully with:
+
+npm run build
+
+Confirmed:
+
+TypeScript compilation passed
+frontend production build succeeded
+browser rendering behavior remained unchanged
+What does it imply about the system?
+
+The frontend architecture is beginning to transition from feature-level implementation into reusable component-oriented design.
+
+This establishes an initial pattern for:
+
+shared UI behavior
+reusable dashboard components
+frontend maintainability
+scalable page development
+Additional Engineering Observation
+
+Refactoring was performed incrementally without changing backend integration behavior.
+
+This reduced duplication while preserving:
+
+API behavior
+routing behavior
+dashboard rendering functionality
+What remains unknown?
+reusable table component strategy
+frontend styling system
+pagination/filtering patterns
+graph visualization component structure
+What’s next?
+Create reusable dashboard table components
+Improve dashboard styling/layout
+Begin search integration
+Add interaction curation controls
+Interview Talking Point
+
+“I refactored duplicated frontend loading and error handling into reusable React components to improve maintainability as the dashboard architecture expanded.”

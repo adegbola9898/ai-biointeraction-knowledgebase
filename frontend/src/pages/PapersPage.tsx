@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPapers } from "../api/papers";
+import ErrorMessage from "../components/ErrorMessage";
+import LoadingMessage from "../components/LoadingMessage";
 import type { Paper } from "../types/paper";
 
 export default function PapersPage() {
@@ -23,11 +25,11 @@ export default function PapersPage() {
   }, []);
 
   if (loading) {
-    return <p>Loading papers...</p>;
+    return <LoadingMessage message="Loading papers..." />;
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <ErrorMessage message={error} />;
   }
 
   return (
