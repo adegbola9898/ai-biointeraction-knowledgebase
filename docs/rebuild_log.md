@@ -1828,3 +1828,78 @@ Then finalize:
 
 ```bash id="jlwmhr"
 echo "22" > frontend/.nvmrc
+
+
+## Sprint 6A — Frontend Paper Ingestion Workflow
+
+### What did we implement?
+
+Added a frontend paper ingestion workflow.
+
+Created:
+
+```text
+frontend/src/components/CreatePaperForm.tsx
+
+Updated:
+
+frontend/src/api/papers.ts
+frontend/src/pages/PapersPage.tsx
+
+The frontend now allows users to submit:
+
+paper title
+paper abstract
+What did we observe?
+
+Submitting a paper from the React frontend successfully called:
+
+POST /papers
+
+The created paper appeared immediately in the Papers dashboard.
+
+Validation
+
+Submitted:
+
+Title:
+Frontend ingestion test
+
+Abstract:
+EGFR interacts with GRB2 during signaling.
+
+The frontend rendered the newly created paper in the table.
+
+Backend validation confirmed the paper was persisted and AI extraction created a pending interaction:
+
+EGFR → GRB2
+status: PENDING
+What does it imply about the system?
+
+The platform workflow now begins correctly with paper ingestion.
+
+Validated flow:
+
+Frontend form
+→ Spring Boot POST /papers
+→ PostgreSQL paper persistence
+→ AI extraction trigger
+→ pending interaction creation
+
+This establishes the first step of the final demo workflow.
+
+What remains unknown?
+paper detail page
+displaying AI extraction results directly after submission
+approve/reject controls
+graph refresh after approval
+What’s next?
+Add interaction approval/rejection controls
+Refresh interactions after paper creation
+Create paper detail page
+Connect approval to graph update
+Interview Talking Point
+
+“I added a paper ingestion workflow where users submit a title and abstract from the frontend, triggering backend persistence and AI-generated pending biological interactions.”
+
+

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getPapers } from "../api/papers";
+import type { Paper } from "../types/paper";
+import CreatePaperForm from "../components/CreatePaperForm";
 import ErrorMessage from "../components/ErrorMessage";
 import LoadingMessage from "../components/LoadingMessage";
-import type { Paper } from "../types/paper";
 
 export default function PapersPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
@@ -24,37 +25,41 @@ export default function PapersPage() {
     loadPapers();
   }, []);
 
-  if (loading) {
-    return <LoadingMessage message="Loading papers..." />;
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} />;
+  function handlePaperCreated(paper: Paper) {
+    setPapers((currentPapers) => [paper, ...currentPapers]);
   }
 
   return (
     <div>
       <h1>Papers Dashboard</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Abstract</th>
-          </tr>
-        </thead>
+      <CreatePaperForm onPaperCreated={handlePaperCreated} />
 
-        <tbody>
-          {papers.map((paper) => (
-            <tr key={paper.id}>
-              <td>{paper.id}</td>
-              <td>{paper.title}</td>
-              <td>{paper.abstractText}</td>
+      {loading && <LoadingMessage message="Loading papers..." />}
+
+      {error && <ErrorMessage message={error} />}
+
+      {!loading && !error && (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Abstract</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {papers.map((paper) => (
+              <tr key={paper.id}>
+                <td>{paper.id}</td>
+                <td>{paper.title}</td>
+                <td>{paper.abstractText}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
