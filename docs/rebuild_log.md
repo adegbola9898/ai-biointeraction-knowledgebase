@@ -2071,3 +2071,100 @@ Result:
 What does it imply?
 
 The frontend interaction model is now aligned with the backend API contract, enabling paper-specific AI extraction review rendering on the paper detail page.
+
+
+## Sprint 6C.1 — Human Validation Workflow
+
+### What did we implement?
+
+Added frontend interaction approval and rejection controls to the paper detail review workflow.
+
+Updated:
+
+frontend/src/api/interactions.ts
+frontend/src/pages/PaperDetailPage.tsx
+
+Added frontend API functions:
+
+approveInteraction()
+rejectInteraction()
+updateInteractionStatus()
+
+Connected frontend controls to:
+
+PATCH /interactions/{id}/status
+
+### What did we observe?
+
+The paper detail page now renders:
+
+AI-extracted interactions
+interaction status
+interaction evidence
+Approve button
+Reject button
+
+Pending interactions can now be reviewed directly from the paper detail page.
+
+### Validation
+
+Validated frontend production build:
+
+npm run build
+
+Validated browser workflow:
+
+/papers
+→ click paper
+→ review AI extraction
+→ click Approve
+
+Validated backend interaction update:
+
+curl http://localhost:8080/interactions/paper/3fc40b0c-f877-4ee8-a69c-fafec42309b4
+
+Result:
+
+status: APPROVED
+
+Validated graph evolution:
+
+curl http://localhost:8080/graph/interactions
+
+Response included:
+
+EGFR → GRB2
+
+### What does it imply about the system?
+
+The platform now supports the complete core AI-assisted curation workflow:
+
+paper ingestion
+→ AI extraction
+→ human validation
+→ graph evolution
+
+Neo4j relationships are only created after explicit human approval.
+
+This establishes the platform’s central scientific governance workflow.
+
+### What remains unknown?
+
+automatic graph refresh after approval
+frontend graph synchronization
+rejected interaction workflows
+interaction confidence visualization
+paper-specific graph navigation
+
+### What’s next?
+
+Refresh Cytoscape graph after approval
+Improve interaction review UI
+Add confidence rendering
+Add interaction filtering
+Improve graph exploration workflow
+
+### Interview Talking Point
+
+“I implemented a human-in-the-loop biological curation workflow where AI-generated interactions remain pending until explicitly approved, at which point the Neo4j knowledge graph updates live.”
+
