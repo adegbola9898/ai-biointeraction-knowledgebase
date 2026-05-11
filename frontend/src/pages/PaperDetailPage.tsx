@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getPaperById } from "../api/papers";
 import {
   approveInteraction,
@@ -18,6 +18,7 @@ export default function PaperDetailPage() {
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingInteractionId, setUpdatingInteractionId] = useState("");
+  const [graphUpdated, setGraphUpdated] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -58,6 +59,8 @@ export default function PaperDetailPage() {
           interaction.id === interactionId ? updatedInteraction : interaction
         )
       );
+
+      setGraphUpdated(true);
     } catch (err) {
       setError("Failed to approve interaction");
     } finally {
@@ -110,6 +113,14 @@ export default function PaperDetailPage() {
       <p>{paper.abstractText}</p>
 
       <h3>AI-Extracted Interactions</h3>
+
+      {graphUpdated && (
+        <div>
+          <p>Interaction approved successfully.</p>
+
+          <Link to="/graph">View Updated Graph</Link>
+        </div>
+      )}
 
       {error && <ErrorMessage message={error} />}
 

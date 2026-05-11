@@ -2168,3 +2168,91 @@ Improve graph exploration workflow
 
 “I implemented a human-in-the-loop biological curation workflow where AI-generated interactions remain pending until explicitly approved, at which point the Neo4j knowledge graph updates live.”
 
+
+## Sprint 6D.1 — Graph Evolution Navigation Workflow
+
+### What did we implement?
+
+Extended the paper detail review workflow with graph evolution navigation after interaction approval.
+
+Updated:
+
+frontend/src/pages/PaperDetailPage.tsx
+
+Added:
+
+graphUpdated frontend state
+approval success feedback
+navigation link to the graph dashboard
+
+### What did we observe?
+
+After approving a pending interaction from the paper detail page, the frontend now displays:
+
+Interaction approved successfully.
+View Updated Graph
+
+This creates a direct workflow transition from:
+
+AI review
+→ interaction approval
+→ graph exploration
+
+### Validation
+
+Validated frontend production build:
+
+npm run build
+
+Validated browser workflow:
+
+submit paper
+→ open paper detail page
+→ approve interaction
+→ success message displayed
+→ navigate to graph dashboard
+
+Validated graph endpoint:
+
+curl http://localhost:8080/graph/interactions
+
+Result included:
+
+EGFR → GRB2
+
+### What does it imply about the system?
+
+The platform now visually connects:
+
+human validation
+→ curated biological relationship creation
+→ graph exploration
+
+This establishes the complete core product narrative:
+
+paper ingestion
+→ AI extraction
+→ human approval
+→ graph evolution
+
+The frontend now explicitly communicates that graph updates are caused by curator approval decisions.
+
+### What remains unknown?
+
+automatic graph refresh without navigation
+interaction filtering
+graph highlighting for newly approved relationships
+confidence visualization
+improved graph styling and controls
+
+### What’s next?
+
+Improve Cytoscape interaction UX
+Add graph filtering
+Highlight newly approved relationships
+Improve graph layouts and styling
+Add structured interaction cards
+
+### Interview Talking Point
+
+“I connected the human validation workflow to the graph exploration workflow so approved biological interactions immediately become explorable in the Neo4j-backed visualization layer.”
