@@ -35,6 +35,11 @@ public class InteractionController {
         return interactionService.getAll();
     }
 
+    @GetMapping("/paper/{paperId}")
+    public List<Interaction> getByPaperId(@PathVariable String paperId) {
+        return interactionService.getByPaperId(paperId);
+    }
+
     @PatchMapping("/{id}/status")
     public Interaction updateStatus(
             @PathVariable String id,

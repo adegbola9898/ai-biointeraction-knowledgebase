@@ -58,6 +58,10 @@ public class InteractionService {
         return interactionRepository.findAll();
     }
 
+    public List<Interaction> getByPaperId(String paperId) {
+        return interactionRepository.findByPaperId(paperId);
+    }
+
     public Interaction updateStatus(String id, String status) {
 
         Interaction interaction = interactionRepository.findById(id)
