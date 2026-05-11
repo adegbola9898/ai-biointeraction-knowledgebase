@@ -2031,3 +2031,43 @@ Add curation controls
 Interview Talking Point
 
 “I added dynamic paper detail pages so the frontend can support paper-centered AI curation workflows instead of only dashboard-level data browsing.”
+
+## Sprint 6B.3 — Frontend Interaction Type Contract Fix
+
+### What did we fix?
+
+Updated the frontend `Interaction` TypeScript type to match the backend interaction response.
+
+Updated:
+
+```text
+frontend/src/types/interaction.ts
+
+Added missing fields:
+
+evidenceText
+paper
+
+Preserved the stricter interaction status union:
+
+PENDING | APPROVED | REJECTED
+Why was this needed?
+
+PaperDetailPage renders AI-extracted interaction evidence using:
+
+interaction.evidenceText
+
+The backend already returns evidenceText, but the frontend type did not define it, causing TypeScript build failure.
+
+Validation
+
+Validated frontend production build:
+
+npm run build
+
+Result:
+
+✓ built successfully
+What does it imply?
+
+The frontend interaction model is now aligned with the backend API contract, enabling paper-specific AI extraction review rendering on the paper detail page.
