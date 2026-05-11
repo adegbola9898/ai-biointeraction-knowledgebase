@@ -1903,3 +1903,69 @@ Interview Talking Point
 “I added a paper ingestion workflow where users submit a title and abstract from the frontend, triggering backend persistence and AI-generated pending biological interactions.”
 
 
+
+## Sprint 6B.1 — Backend Paper Detail Endpoint
+
+### What did we implement?
+
+Added a backend endpoint for retrieving a single paper by ID.
+
+Updated:
+
+```text
+backend-java/src/main/java/com/samyus/biointeraction/service/PaperService.java
+backend-java/src/main/java/com/samyus/biointeraction/controller/PaperController.java
+
+Added:
+
+GET /papers/{id}
+What did we observe?
+
+Previously, paper detail lookup returned:
+
+404 Not Found
+
+because the backend only supported:
+
+GET /papers
+POST /papers
+Validation
+
+Validated backend tests successfully:
+
+./mvnw test
+
+Validated endpoint manually:
+
+curl http://localhost:8080/papers/3fc40b0c-f877-4ee8-a69c-fafec42309b4
+
+Response:
+
+{
+  "title": "Frontend ingestion test",
+  "abstractText": "EGFR interacts with GRB2 during signaling.",
+  "id": "3fc40b0c-f877-4ee8-a69c-fafec42309b4"
+}
+What does it imply about the system?
+
+The backend now supports paper-specific detail views, which are required for a proper AI curation review surface.
+
+This enables the next frontend workflow:
+
+Papers dashboard
+→ click paper
+→ /papers/:id detail page
+→ review AI-extracted interactions
+What remains unknown?
+frontend paper detail page
+paper-specific interaction retrieval
+AI extraction display on detail page
+approval/rejection controls
+What’s next?
+Add frontend getPaperById() API function
+Add /papers/:id React route
+Create PaperDetailPage
+Link papers table rows to detail pages
+Interview Talking Point
+
+“I extended the backend with a paper detail endpoint to support paper-centered AI curation workflows and enable frontend review pages for extracted biological interactions.”

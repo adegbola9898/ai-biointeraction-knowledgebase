@@ -76,4 +76,9 @@ public class PaperService {
     public List<Paper> getAllPapers() {
         return paperRepository.findAll();
     }
+
+    public Paper getPaperById(String id) {
+        return paperRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paper not found"));
+    }
 }

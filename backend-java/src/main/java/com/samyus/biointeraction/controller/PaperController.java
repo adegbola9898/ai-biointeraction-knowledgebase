@@ -30,4 +30,9 @@ public class PaperController {
     public List<Paper> getPapers() {
         return paperService.getAllPapers();
     }
+
+    @GetMapping("/{id}")
+    public Paper getPaperById(@PathVariable String id) {
+        return paperService.getPaperById(id);
+    }
 }
