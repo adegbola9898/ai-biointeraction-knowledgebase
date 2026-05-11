@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getPapers } from "../api/papers";
 import type { Paper } from "../types/paper";
 import CreatePaperForm from "../components/CreatePaperForm";
@@ -52,8 +53,12 @@ export default function PapersPage() {
           <tbody>
             {papers.map((paper) => (
               <tr key={paper.id}>
-                <td>{paper.id}</td>
-                <td>{paper.title}</td>
+                <td>
+                  <Link to={`/papers/${paper.id}`}>{paper.id}</Link>
+                </td>
+                <td>
+                  <Link to={`/papers/${paper.id}`}>{paper.title}</Link>
+                </td>
                 <td>{paper.abstractText}</td>
               </tr>
             ))}

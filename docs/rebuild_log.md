@@ -1969,3 +1969,65 @@ Link papers table rows to detail pages
 Interview Talking Point
 
 “I extended the backend with a paper detail endpoint to support paper-centered AI curation workflows and enable frontend review pages for extracted biological interactions.”
+
+
+## Sprint 6B.2 — Frontend Paper Detail Page
+
+### What did we implement?
+
+Added a frontend paper detail workflow.
+
+Updated:
+
+```text
+frontend/src/api/papers.ts
+frontend/src/routes/AppRoutes.tsx
+frontend/src/pages/PapersPage.tsx
+
+Created:
+
+frontend/src/pages/PaperDetailPage.tsx
+What did we observe?
+
+The Papers dashboard now links each paper ID and title to a dynamic detail page:
+
+/papers/:id
+Validation
+
+Validated frontend production build:
+
+npm run build
+
+Validated browser navigation:
+
+/papers
+→ click paper
+→ /papers/3fc40b0c-f877-4ee8-a69c-fafec42309b4
+
+The detail page successfully rendered:
+
+paper title
+paper ID
+abstract
+What does it imply about the system?
+
+The frontend now has the foundation for a paper-centered curation screen.
+
+This enables the next workflow stage:
+
+Paper detail
+→ AI-extracted interactions
+→ human approval/rejection
+→ graph update
+What remains unknown?
+paper-specific interaction filtering
+interaction review panel
+approve/reject controls
+graph refresh after validation
+What’s next?
+Fetch interactions linked to the current paper
+Display AI-extracted pending interactions on the paper detail page
+Add curation controls
+Interview Talking Point
+
+“I added dynamic paper detail pages so the frontend can support paper-centered AI curation workflows instead of only dashboard-level data browsing.”
