@@ -87,6 +87,34 @@ export default function PaperDetailPage() {
     }
   }
 
+  function formatConfidence(confidence: number | null | undefined) {
+    if (confidence == null) {
+      return "N/A";
+    }
+
+    return `${(confidence * 100).toFixed(1)}%`;
+  }
+
+  function formatTimestamp(timestamp: string | null | undefined) {
+    if (!timestamp) {
+      return "N/A";
+    }
+
+    return new Date(timestamp).toLocaleString();
+  }
+
+  function getStatusColor(status: Interaction["status"]) {
+    if (status === "APPROVED") {
+      return "green";
+    }
+
+    if (status === "REJECTED") {
+      return "red";
+    }
+
+    return "orange";
+  }
+
   if (loading) {
     return <LoadingMessage message="Loading paper detail..." />;
   }
@@ -103,21 +131,37 @@ export default function PaperDetailPage() {
     <div>
       <h1>Paper Detail</h1>
 
-      <h2>{paper.title}</h2>
+      <section
+        style={{
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "16px",
+          marginBottom: "24px",
+        }}
+      >
+        <h2>{paper.title}</h2>
 
-      <p>
-        <strong>Paper ID:</strong> {paper.id}
-      </p>
+        <p>
+          <strong>Paper ID:</strong> {paper.id}
+        </p>
 
-      <h3>Abstract</h3>
-      <p>{paper.abstractText}</p>
+        <h3>Abstract</h3>
+        <p style={{ lineHeight: 1.6 }}>{paper.abstractText}</p>
+      </section>
 
       <h3>AI-Extracted Interactions</h3>
 
       {graphUpdated && (
-        <div>
-          <p>Interaction approved successfully.</p>
-
+        <div
+          style={{
+            border: "1px solid #b7e4c7",
+            borderRadius: "8px",
+            padding: "12px",
+            marginBottom: "16px",
+            backgroundColor: "#f0fff4",
+          }}
+        >
+          <p style={{ marginTop: 0 }}>Interaction approved successfully.</p>
           <Link to="/graph">View Updated Graph</Link>
         </div>
       )}
@@ -133,25 +177,81 @@ export default function PaperDetailPage() {
             const isPending = interaction.status === "PENDING";
 
             return (
-              <div key={interaction.id}>
-                <h4>
+              <article
+                key={interaction.id}
+                style={{
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  padding: "16px",
+                  marginBottom: "20px",
+                  backgroundColor: "#fafafa",
+                }}
+              >
+                <h4 style={{ marginTop: 0 }}>
                   {interaction.proteinA} → {interaction.proteinB}
                 </h4>
+
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span
+                    style={{
+                      color: getStatusColor(interaction.status),
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {interaction.status}
+                  </span>
+                </p>
 
                 <p>
                   <strong>Type:</strong> {interaction.interactionType}
                 </p>
 
                 <p>
-                  <strong>Status:</strong> {interaction.status}
+                  <strong>Confidence:</strong>{" "}
+                  {formatConfidence(interaction.confidence)}
+                </p>
+
+                <div>
+                  <strong>Evidence:</strong>
+
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      padding: "10px",
+                      backgroundColor: "#f0f0f0",
+                      borderRadius: "6px",
+                      fontStyle: "italic",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {interaction.evidenceText || "N/A"}
+                  </div>
+                </div>
+
+                <p>
+                  <strong>Extraction Model:</strong>{" "}
+                  {interaction.extractionModel || "N/A"}
                 </p>
 
                 <p>
-                  <strong>Evidence:</strong> {interaction.evidenceText}
+                  <strong>Extraction Method:</strong>{" "}
+                  {interaction.extractionMethod || "N/A"}
+                </p>
+
+                <p>
+                  <strong>Extraction Timestamp:</strong>{" "}
+                  {formatTimestamp(interaction.extractionTimestamp)}
                 </p>
 
                 {isPending && (
-                  <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      marginTop: "12px",
+                    }}
+                  >
                     <button
                       type="button"
                       disabled={isUpdating}
@@ -169,7 +269,7 @@ export default function PaperDetailPage() {
                     </button>
                   </div>
                 )}
-              </div>
+              </article>
             );
           })}
         </div>
