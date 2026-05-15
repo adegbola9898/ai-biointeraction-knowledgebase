@@ -2336,3 +2336,122 @@ persist extracted interactions
 add extraction status tracking
 implement retry/error handling
 build pending-review workflow
+
+
+## Sprint 7B.2 — Persist LLM Extraction Metadata
+
+### What did we implement?
+
+Upgraded the backend interaction model to persist AI extraction metadata.
+
+Updated:
+
+backend-java/src/main/java/com/samyus/biointeraction/model/Interaction.java
+backend-java/src/main/java/com/samyus/biointeraction/service/PaperService.java
+backend-java/src/main/java/com/samyus/biointeraction/service/InteractionService.java
+backend-java/src/main/java/com/samyus/biointeraction/model/Paper.java
+
+Added interaction fields:
+
+confidence
+extractionModel
+extractionMethod
+extractionTimestamp
+
+Updated paper abstract storage to support realistic scientific abstracts using TEXT instead of VARCHAR(255).
+
+### What did we observe?
+
+A realistic PubMed-style abstract initially failed because the existing paper abstract column was limited to 255 characters.
+
+PostgreSQL returned:
+
+ERROR: value too long for type character varying(255)
+
+The Java entity was updated with:
+
+@Column(columnDefinition = "TEXT")
+
+The existing PostgreSQL column was manually migrated:
+
+ALTER TABLE papers
+ALTER COLUMN abstract_text TYPE TEXT;
+
+After migration, the long scientific abstract persisted successfully.
+
+### Validation
+
+Validated backend build:
+
+./mvnw test
+
+Validated realistic paper submission:
+
+POST /papers
+
+Submitted:
+
+EGFR-mediated signaling dynamics in epithelial carcinoma cells
+
+Validated paper-specific interactions:
+
+curl http://localhost:8080/interactions/paper/5bfa1852-091a-4992-bcdb-b18f55b2c611
+
+The LLM extracted multiple pending interactions including:
+
+EGFR → GRB2
+interactionType: binds
+confidence: 0.99
+extractionModel: gpt-5.4-mini
+extractionMethod: LLM
+status: PENDING
+
+and:
+
+EGFR → GRB2
+interactionType: promotes recruitment of
+confidence: 0.97
+extractionModel: gpt-5.4-mini
+extractionMethod: LLM
+status: PENDING
+
+### What does it imply about the system?
+
+The platform now supports auditable AI-generated biological extraction.
+
+Each candidate interaction now carries:
+
+biological relationship
+evidence text
+confidence score
+model provenance
+extraction method
+extraction timestamp
+human validation status
+
+This moves the system from a rule-based/mock extraction prototype into a real LLM-powered scientific curation platform.
+
+### What remains unknown?
+
+frontend confidence rendering
+frontend model/provenance display
+dynamic model metadata propagation from FastAPI
+database migrations using Flyway or Liquibase
+deduplication of semantically overlapping interactions
+
+### What’s next?
+
+Update the AI curation review surface to display:
+
+confidence
+extraction model
+extraction method
+extraction timestamp
+status badges
+evidence text
+
+### Interview Talking Point
+
+“I upgraded the backend so LLM-extracted interactions are stored with confidence scores, model provenance, extraction method, timestamps, evidence text, and human validation status, making the AI workflow auditable and scientifically traceable.”
+
+

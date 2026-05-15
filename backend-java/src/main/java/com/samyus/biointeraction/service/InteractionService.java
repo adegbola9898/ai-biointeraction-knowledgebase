@@ -37,7 +37,14 @@ public class InteractionService {
                 .orElseThrow(() -> new RuntimeException("Paper not found"));
 
         Interaction interaction = new Interaction(
-                proteinA, proteinB, type, evidence, paper
+                proteinA,
+                proteinB,
+                type,
+                evidence,
+                1.0,
+                "manual",
+                "MANUAL",
+                paper
         );
 
         Interaction saved = interactionRepository.save(interaction);

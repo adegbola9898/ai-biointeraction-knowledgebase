@@ -10,10 +10,13 @@ public class AiExtractionClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Map callExtractionService(String text) {
-        String url = "http://localhost:8000/extract";
+    public Map callExtractionService(String title, String abstractText) {
+        String url = "http://localhost:8000/extract/interactions";
 
-        Map<String, String> request = Map.of("text", text);
+        Map<String, String> request = Map.of(
+                "title", title,
+                "abstractText", abstractText
+        );
 
         return restTemplate.postForObject(url, request, Map.class);
     }

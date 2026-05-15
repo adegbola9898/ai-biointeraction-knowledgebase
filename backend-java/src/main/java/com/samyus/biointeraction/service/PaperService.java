@@ -42,7 +42,7 @@ public class PaperService {
         );
 
         try {
-            Map response = aiClient.callExtractionService(abstractText);
+            Map response = aiClient.callExtractionService(title, abstractText);
             List<Map> interactions = (List<Map>) response.get("interactions");
 
             for (Map interactionData : interactions) {
@@ -51,6 +51,9 @@ public class PaperService {
                         (String) interactionData.get("proteinB"),
                         (String) interactionData.get("interactionType"),
                         (String) interactionData.get("evidenceText"),
+                        ((Number) interactionData.get("confidence")).doubleValue(),
+                        "gpt-5.4-mini",
+                        "LLM",
                         savedPaper
                 );
 
