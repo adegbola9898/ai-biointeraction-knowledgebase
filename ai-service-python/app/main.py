@@ -1,26 +1,54 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List
+from dotenv import load_dotenv
+
+from app.providers.openai_provider import extract_interactions as openai_extract_interactions
+
+
+load_dotenv()
 
 app = FastAPI()
 
+
 class ExtractionRequest(BaseModel):
-    text: str
+    title: str
+    abstractText: str
 
-@app.post("/extract")
-def extract_interactions(request: ExtractionRequest):
-    text = request.text
 
-    # Simple mock extraction logic
-    interactions = []
+class ExtractedInteraction(BaseModel):
+    proteinA: str
+    proteinB: str
+    interactionType: str
+    evidenceText: str
+    confidence: float
 
-    if "EGFR" in text and "GRB2" in text:
-        interactions.append({
-            "proteinA": "EGFR",
-            "proteinB": "GRB2",
-            "interactionType": "binding",
-            "evidenceText": text
-        })
 
+class ExtractionResponse(BaseModel):
+    interactions: List[ExtractedInteraction]
+
+
+@app.get("/health")
+def health():
     return {
-        "interactions": interactions
+        "status": "UP",
+        "service": "ai-extraction-service",
+        "provider": "openai",
     }
+
+
+@app.post("/extract/interactions", response_model=ExtractionResponse)
+def extract_interactions(request: ExtractionRequest):
+    try:
+        result = openai_extract_interactions(
+            request.title,
+            request.abstractText,
+        )
+
+        return ExtractionResponse(**result)
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI extraction failed: {str(error)}"
+        )
