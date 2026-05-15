@@ -2256,3 +2256,83 @@ Add structured interaction cards
 ### Interview Talking Point
 
 “I connected the human validation workflow to the graph exploration workflow so approved biological interactions immediately become explorable in the Neo4j-backed visualization layer.”
+
+# Sprint 7A — OpenAI LLM Extraction Foundation
+
+## Objective
+Replace the previous mock/rule-based interaction extraction workflow with a real LLM-powered AI extraction service.
+
+---
+
+## Completed Work
+
+### AI Service Infrastructure
+- Built standalone FastAPI AI extraction service
+- Added `/health` endpoint for service monitoring
+- Added `/extract/interactions` endpoint for biological interaction extraction
+- Configured environment-based OpenAI API integration
+
+### LLM Extraction Workflow
+- Implemented OpenAI-powered extraction pipeline
+- Added structured JSON response formatting
+- Added confidence scoring to extracted interactions
+- Added evidence text preservation from abstracts
+
+### Validation
+Successful extraction test:
+
+Input:
+```json
+{
+  "title": "EGFR signaling",
+  "abstractText": "EGFR interacts with GRB2 during signaling."
+}
+
+Output:
+
+{
+  "interactions": [
+    {
+      "proteinA": "EGFR",
+      "proteinB": "GRB2",
+      "interactionType": "interacts_with",
+      "evidenceText": "EGFR interacts with GRB2 during signaling.",
+      "confidence": 0.99
+    }
+  ]
+}
+Architectural Evolution
+
+System evolved from:
+
+Mock extraction / rule-based parsing
+
+Into:
+
+Spring Boot orchestration layer
+        ↓
+FastAPI AI extraction layer
+        ↓
+OpenAI LLM inference
+        ↓
+Structured interaction JSON
+        ↓
+Persistence pipeline
+Technical Significance
+
+This milestone establishes the foundation for:
+
+paper-scale automated interaction extraction
+multi-model AI support
+human review workflows
+confidence-based curation
+future agentic extraction pipelines
+Next Planned Sprint
+
+Sprint 7B:
+
+integrate FastAPI service into Spring Boot backend
+persist extracted interactions
+add extraction status tracking
+implement retry/error handling
+build pending-review workflow
