@@ -2617,3 +2617,80 @@ Therefore, every deployment change must be documented clearly enough that the pl
 Create a backend Dockerfile for the Spring Boot service and validate that the backend can be built and run as a container.
 
 
+## Sprint 8A.2 — Backend Dockerfile and Compose Backend Runtime
+
+### What did we implement?
+
+Containerized the Spring Boot backend.
+
+Added:
+
+backend-java/Dockerfile
+backend-java/.dockerignore
+
+Updated:
+
+backend-java/src/main/resources/application.properties
+docker-compose.yml
+
+The backend now supports environment-variable configuration for database connectivity.
+
+### What did we observe?
+
+The backend image built successfully:
+
+docker build -t biointeraction-backend .
+
+A standalone container run initially failed because host.docker.internal was not resolvable in the Linux/WSL environment.
+
+This revealed an important container networking issue:
+
+host.docker.internal is not portable across all Docker environments.
+
+The solution was to run backend inside Docker Compose and connect it to PostgreSQL using the Compose service name:
+
+jdbc:postgresql://postgres:5432/biointeraction_db
+
+### Validation
+
+Validated Compose backend startup:
+
+docker compose up --build backend
+
+Spring Boot started successfully inside the container.
+
+Confirmed database connection:
+
+Database JDBC URL [jdbc:postgresql://postgres:5432/biointeraction_db]
+
+Validated external API access:
+
+curl http://localhost:8080/papers
+
+The backend returned persisted paper records successfully.
+
+### What does it imply about the system?
+
+The platform has started moving from manual local execution into containerized service orchestration.
+
+The backend is no longer dependent on machine-specific local startup.
+
+It can now run as a portable container connected to infrastructure services through Docker Compose networking.
+
+### What remains unknown?
+
+FastAPI AI service is not yet containerized
+frontend is not yet containerized
+backend still needs to call AI service through Docker service networking
+Elasticsearch and Neo4j URLs may need environment-variable configuration
+production secrets management is not yet implemented
+
+### What’s next?
+
+Containerize the FastAPI AI extraction service and add it to Docker Compose.
+
+Then update Spring Boot to call the AI service using a configurable URL instead of hardcoded localhost.
+
+### Interview Talking Point
+
+“I containerized the Spring Boot backend using a multi-stage Docker build and moved it into Docker Compose networking so it connects to PostgreSQL through service discovery instead of localhost, making the backend runtime portable and deployment-ready.”

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
@@ -30,6 +28,23 @@ services:
       - xpack.security.enabled=false
     ports:
       - "9200:9200"
+
+  backend:
+    build:
+      context: ./backend-java
+    container_name: biointeraction-backend
+    depends_on:
+      - postgres
+      - neo4j
+      - elasticsearch
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/biointeraction_db
+      SPRING_DATASOURCE_USERNAME: bio_user
+      SPRING_DATASOURCE_PASSWORD: bio_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    ports:
+      - "8080:8080"
 
 volumes:
   postgres_data:
