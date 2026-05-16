@@ -1,5 +1,9 @@
 package com.samyus.biointeraction.search;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,23 +13,36 @@ import java.util.Map;
 public class SearchClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String baseUrl = "http://localhost:9200";
+
+    @Value("${elasticsearch.base-url:http://localhost:9200}")
+    private String baseUrl;
 
     public void indexPaper(String id, String title, String abstractText) {
-        Map<String, Object> document = Map.of(
+        String url = baseUrl + "/biointeraction-docs/_doc/paper-" + id;
+
+        Map<String, Object> body = Map.of(
                 "type", "paper",
-                "id", id,
+                "paperId", id,
                 "title", title,
                 "abstractText", abstractText
         );
 
-        restTemplate.put(baseUrl + "/biointeraction-docs/_doc/paper-" + id, document);
+        sendDocument(url, body);
     }
 
-    public void indexInteraction(String id, String proteinA, String proteinB, String interactionType, String evidenceText, String status) {
-        Map<String, Object> document = Map.of(
+    public void indexInteraction(
+            String id,
+            String proteinA,
+            String proteinB,
+            String interactionType,
+            String evidenceText,
+            String status
+    ) {
+        String url = baseUrl + "/biointeraction-docs/_doc/interaction-" + id;
+
+        Map<String, Object> body = Map.of(
                 "type", "interaction",
-                "id", id,
+                "interactionId", id,
                 "proteinA", proteinA,
                 "proteinB", proteinB,
                 "interactionType", interactionType,
@@ -33,11 +50,13 @@ public class SearchClient {
                 "status", status
         );
 
-        restTemplate.put(baseUrl + "/biointeraction-docs/_doc/interaction-" + id, document);
+        sendDocument(url, body);
     }
 
     public Map search(String query) {
-        Map<String, Object> request = Map.of(
+        String url = baseUrl + "/biointeraction-docs/_search";
+
+        Map<String, Object> body = Map.of(
                 "query", Map.of(
                         "multi_match", Map.of(
                                 "query", query,
@@ -54,6 +73,22 @@ public class SearchClient {
                 )
         );
 
-        return restTemplate.postForObject(baseUrl + "/biointeraction-docs/_search", request, Map.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request =
+                new HttpEntity<>(body, headers);
+
+        return restTemplate.postForObject(url, request, Map.class);
+    }
+
+    private void sendDocument(String url, Map<String, Object> body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request =
+                new HttpEntity<>(body, headers);
+
+        restTemplate.put(url, request);
     }
 }
