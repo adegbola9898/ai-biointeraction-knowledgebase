@@ -2455,3 +2455,165 @@ evidence text
 “I upgraded the backend so LLM-extracted interactions are stored with confidence scores, model provenance, extraction method, timestamps, evidence text, and human validation status, making the AI workflow auditable and scientifically traceable.”
 
 
+## Sprint 8A.1 — Productionization Baseline
+
+### Goal
+
+Begin containerizing the full AI-assisted biointeraction platform while preserving a clear understanding of the current local runtime architecture.
+
+The goal is not only deployment, but reproducible platform evolution.
+
+Deployment will become the foundation for future work including:
+
+Graph Integrity Semantics
+AI reliability hardening
+search improvements
+authentication
+observability
+CI/CD
+cloud deployment
+
+### Current Runtime Architecture
+
+At the start of Sprint 8A, the platform runs as a hybrid local system.
+
+Docker Compose currently starts infrastructure services only:
+
+PostgreSQL
+Elasticsearch
+Neo4j
+
+Command:
+
+docker compose up -d
+
+The application services still run outside Docker:
+
+FastAPI AI service:
+
+cd ai-service-python
+source .venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+
+Spring Boot backend:
+
+cd backend-java
+./mvnw spring-boot:run
+
+React frontend:
+
+cd frontend
+npm run dev
+
+### Current Service Ports
+
+PostgreSQL:
+
+localhost:5432
+
+Elasticsearch:
+
+localhost:9200
+
+Neo4j browser:
+
+localhost:7474
+
+Neo4j bolt:
+
+localhost:7687
+
+FastAPI AI service:
+
+localhost:8000
+
+Spring Boot backend:
+
+localhost:8080
+
+React frontend:
+
+localhost:5173 or dynamic Vite port
+
+### Current Working Platform Flow
+
+React frontend
+→ Spring Boot backend
+→ PostgreSQL persistence
+→ FastAPI AI service
+→ OpenAI LLM extraction
+→ Interaction persistence
+→ Human review UI
+→ Neo4j graph update after approval
+
+### What We Validated Before Containerization
+
+Validated infrastructure startup:
+
+docker compose up -d
+
+Validated FastAPI health:
+
+curl http://localhost:8000/health
+
+Result:
+
+status: UP
+service: ai-extraction-service
+provider: openai
+
+Validated backend endpoints:
+
+curl http://localhost:8080/papers
+curl http://localhost:8080/interactions
+
+Validated frontend startup:
+
+npm run dev
+
+Validated browser workflow:
+
+Papers dashboard
+Paper detail review
+Interactions review queue
+LLM provenance rendering
+
+### Why This Matters
+
+The platform is now a multi-service AI scientific system.
+
+Manual startup works, but it is fragile because each service must be started independently.
+
+Containerization is needed to improve:
+
+reproducibility
+deployment readiness
+onboarding
+environment consistency
+service networking
+future cloud deployment
+
+### Productionization Principle
+
+Deployment is not the end of development.
+
+Deployment should make future work easier and safer.
+
+Future development will continue after deployment, including:
+
+Graph Integrity Semantics
+deduplication
+evidence aggregation
+AI reliability
+prompt versioning
+search improvements
+authentication
+observability
+
+Therefore, every deployment change must be documented clearly enough that the platform can be surgically evolved after deployment.
+
+### Next Step
+
+Create a backend Dockerfile for the Spring Boot service and validate that the backend can be built and run as a container.
+
+
