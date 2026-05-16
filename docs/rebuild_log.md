@@ -2694,3 +2694,901 @@ Then update Spring Boot to call the AI service using a configurable URL instead 
 ### Interview Talking Point
 
 “I containerized the Spring Boot backend using a multi-stage Docker build and moved it into Docker Compose networking so it connects to PostgreSQL through service discovery instead of localhost, making the backend runtime portable and deployment-ready.”
+
+
+
+
+Sprint 8A — Platform Containerization & Orchestrated Runtime Manual
+Sprint Goal
+
+Sprint 8A transformed the biointeraction platform from a locally coordinated development stack into a reproducible multi-service containerized platform orchestrated through Docker Compose.
+
+This sprint established the first true deployable runtime architecture for the system.
+
+1. Starting State Before Sprint 8A
+
+Before this sprint:
+
+Infrastructure Services
+
+The project already used Docker Compose for infrastructure services only:
+
+PostgreSQL
+Neo4j
+Elasticsearch
+
+via:
+
+docker compose up -d
+Application Runtime
+
+However:
+
+Spring Boot backend
+
+was still started manually:
+
+./mvnw spring-boot:run
+FastAPI AI service
+
+was also started manually through:
+
+source .venv/bin/activate
+uvicorn app.main:app --reload
+
+This created several architectural limitations:
+
+localhost-dependent networking
+manual startup ordering
+inconsistent runtime environments
+non-portable deployment behavior
+inability to deploy cleanly to cloud/container platforms
+
+The system was still:
+
+developer-machine coordinated
+
+rather than:
+
+platform orchestrated
+2. Sprint 8A Objectives
+
+The sprint aimed to achieve:
+
+Primary Goals
+Backend containerization
+
+Convert Spring Boot backend into a reproducible Docker image.
+
+AI service containerization
+
+Convert FastAPI OpenAI extraction service into a portable Docker image.
+
+Service orchestration
+
+Enable backend, AI service, PostgreSQL, Elasticsearch, and Neo4j to communicate entirely through Docker Compose networking.
+
+Environment-driven configuration
+
+Remove hardcoded localhost dependencies.
+
+Productionization foundation
+
+Prepare the system for future:
+
+cloud deployment
+CI/CD
+scaling
+orchestration evolution
+3. Spring Boot Backend Containerization
+Dockerfile Created
+
+File:
+
+backend-java/Dockerfile
+
+Final structure:
+
+FROM eclipse-temurin:21-jdk AS build
+
+WORKDIR /app
+
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
+
+COPY src src
+
+RUN ./mvnw clean package -DskipTests
+
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+4. Important Backend Containerization Decisions
+Multi-stage build
+
+The backend image uses:
+
+build stage
+lightweight runtime stage
+
+This minimizes runtime image size.
+
+Dependency caching optimization
+
+Used:
+
+RUN ./mvnw dependency:go-offline
+
+before copying source files.
+
+This allows:
+
+faster rebuilds
+better Docker layer caching
+more efficient CI/CD later
+Skipping tests during image build
+
+Important decision:
+
+RUN ./mvnw clean package -DskipTests
+
+was intentionally used.
+
+Why?
+
+Spring Boot tests attempted to initialize the application context and connect to PostgreSQL during image build.
+
+This caused failures such as:
+
+Unable to determine Dialect without JDBC metadata
+
+because databases are not guaranteed during Docker build stages.
+
+Architectural conclusion
+
+Docker image builds should focus on:
+
+packaging
+reproducibility
+runtime assembly
+
+while:
+
+integration testing
+orchestration testing
+CI validation
+
+will later be handled separately through:
+
+Testcontainers
+CI pipelines
+dedicated integration test stages
+5. Backend .dockerignore Added
+
+File:
+
+backend-java/.dockerignore
+
+Purpose:
+
+reduce build context size
+avoid unnecessary files in images
+improve build speed
+6. FastAPI AI Service Containerization
+Dockerfile Created
+
+File:
+
+ai-service-python/Dockerfile
+
+Final structure:
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app app
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+7. AI Service Dependency Stabilization
+requirements.txt Expanded
+
+Initial requirements were incomplete.
+
+Final requirements included:
+
+fastapi
+uvicorn[standard]
+openai
+python-dotenv
+pydantic
+google-generativeai
+
+This ensured:
+
+OpenAI provider support
+Gemini provider support
+dotenv loading
+FastAPI runtime consistency
+8. AI Service .dockerignore Added
+
+File:
+
+ai-service-python/.dockerignore
+
+Excluded:
+
+.venv
+.env
+__pycache__
+.git
+
+This was critically important for:
+
+security
+image cleanliness
+preventing API key leakage
+9. AI Service Validation
+
+AI container tested independently:
+
+docker run --rm \
+  -p 8000:8000 \
+  --env-file .env \
+  biointeraction-ai-service
+
+Validation succeeded.
+
+Health endpoint returned:
+
+{
+  "status": "UP",
+  "service": "ai-extraction-service",
+  "provider": "openai"
+}
+
+This confirmed:
+
+container runtime integrity
+OpenAI environment loading
+uvicorn startup
+FastAPI application wiring
+10. Environment-Driven Backend Configuration
+AI Service URL Abstraction
+
+Original backend implementation:
+
+String url = "http://localhost:8000/extract/interactions";
+
+This fails inside containers because:
+
+localhost inside backend container refers to itself
+not the AI service container
+AiExtractionClient Refactored
+
+New implementation:
+
+@Value("${ai.service.base-url:http://localhost:8000}")
+private String aiServiceBaseUrl;
+
+Endpoint construction became:
+
+String url = aiServiceBaseUrl + "/extract/interactions";
+application.properties Updated
+
+Added:
+
+ai.service.base-url=${AI_SERVICE_BASE_URL:http://localhost:8000}
+
+This enabled:
+
+local development compatibility
+Docker Compose service networking
+future cloud deployment flexibility
+11. Elasticsearch Containerization Bug Discovery
+Initial Failure
+
+After Compose orchestration, POST /papers returned:
+
+500 Internal Server Error
+
+while GET /papers still worked.
+
+This proved:
+
+PostgreSQL persistence worked
+backend startup worked
+orchestration partially worked
+Root Cause
+
+Backend logs revealed:
+
+Connection refused
+http://localhost:9200
+
+Inside containers:
+
+localhost
+
+refers to:
+
+the backend container itself
+
+not:
+
+the Elasticsearch container
+12. SearchClient Refactor
+
+SearchClient was upgraded to use environment-driven Elasticsearch URLs.
+
+Added:
+
+@Value("${elasticsearch.base-url:http://localhost:9200}")
+private String baseUrl;
+
+All indexing/search endpoints were converted to:
+
+baseUrl + "/biointeraction-docs/..."
+13. Hidden Architecture Bug Exposed
+
+During clean Docker builds:
+
+SearchController
+→ expected searchClient.search(...)
+
+but the rewritten SearchClient accidentally removed:
+
+the search() method
+
+This caused:
+
+cannot find symbol
+method search(java.lang.String)
+
+Important architectural lesson:
+
+clean containerized builds expose hidden inconsistencies
+
+Local stale compiled classes had previously masked this issue.
+
+The missing method was restored successfully.
+
+14. Docker Compose Architecture Upgrade
+docker-compose.yml Expanded
+
+Compose evolved from infrastructure-only orchestration into full application orchestration.
+
+New services added:
+
+ai-service:
+backend:
+Final Orchestrated Runtime
+
+Compose now manages:
+
+postgres
+neo4j
+elasticsearch
+ai-service
+backend
+15. Service Discovery Architecture
+
+Compose networking now uses service names:
+
+postgres
+elasticsearch
+ai-service
+
+instead of localhost.
+
+Examples:
+
+jdbc:postgresql://postgres:5432/biointeraction_db
+http://ai-service:8000
+http://elasticsearch:9200
+
+This is the foundational deployment architecture required for:
+
+Kubernetes
+cloud runtimes
+scalable orchestration
+16. Full Orchestrated Runtime Validation
+Compose Startup
+
+Validated successfully:
+
+docker compose up --build
+Successful Workflow Validation
+
+Validated end-to-end runtime through:
+
+curl -X POST http://localhost:8080/papers
+
+with realistic PubMed-style abstracts.
+
+17. Final Validated Orchestration Flow
+
+The following workflow successfully executed:
+
+API request
+→ backend container
+→ AI service container
+→ OpenAI LLM
+→ extracted interactions
+→ PostgreSQL persistence
+→ Elasticsearch indexing
+→ API response
+
+This represented the first true:
+
+fully orchestrated deployable AI scientific platform runtime
+18. Final Interaction Validation
+
+Validated interaction extraction:
+
+{
+  "proteinA": "EGFR",
+  "proteinB": "GRB2",
+  "interactionType": "complex formation",
+  "confidence": 0.99,
+  "extractionModel": "gpt-5.4-mini",
+  "extractionMethod": "LLM"
+}
+
+This confirmed:
+
+containerized AI extraction
+metadata persistence
+OpenAI inference orchestration
+cross-service runtime stability
+19. Architectural Evolution Achieved
+
+Sprint 8A transformed the system from:
+
+manual localhost development stack
+
+into:
+
+environment-driven orchestrated multi-service platform
+20. Most Important Architectural Outcomes
+Achieved
+Reproducible deployment runtime
+Multi-container orchestration
+Service discovery architecture
+Environment-driven configuration
+Containerized AI inference
+Deployable backend image
+Deployable AI service image
+Compose-based orchestration
+Elimination of localhost assumptions
+Productionization foundation
+21. Remaining Future Productionization Work
+
+Still pending:
+
+Frontend containerization
+Unified frontend orchestration
+Cloud deployment targets
+Reverse proxy / ingress
+Authentication & authorization
+Observability & structured logging
+CI/CD pipelines
+Health probes & readiness checks
+Testcontainers integration
+Kubernetes readiness
+Secret management
+Graph semantic integrity work
+Advanced biological validation
+22. Sprint 8A Final Status
+
+Sprint 8A successfully established the platform’s first true deployable orchestrated runtime architecture.
+
+The system now operates as:
+
+containerized scientific AI platform
+
+rather than:
+
+manually coordinated development application
+
+
+Sprint 8B — Frontend Containerization & Unified Platform Runtime Manual
+Sprint Goal
+
+Sprint 8B completed the platform containerization transition by converting the React frontend into a production-style containerized runtime and integrating it into the unified Docker Compose orchestration architecture.
+
+This sprint established the first fully browser-accessible orchestrated runtime of the biointeraction platform.
+
+1. Starting State Before Sprint 8B
+
+Before Sprint 8B:
+
+Already Containerized
+
+The platform already had:
+
+PostgreSQL container
+Elasticsearch container
+Neo4j container
+Spring Boot backend container
+FastAPI AI service container
+
+All orchestrated successfully through:
+
+docker compose up --build
+Frontend Runtime Limitation
+
+However, the frontend still relied on:
+
+npm run dev
+
+through the Vite development server.
+
+This created several productionization limitations:
+
+frontend runtime not containerized
+frontend startup required local Node.js tooling
+inconsistent runtime architecture
+non-production serving behavior
+no unified platform orchestration
+no deployable frontend artifact
+
+The platform was still partially split between:
+
+orchestrated containers
+and:
+local development runtime
+2. Sprint 8B Objectives
+
+Sprint 8B aimed to achieve:
+
+Primary Goals
+Frontend Docker image creation
+Production frontend runtime
+Nginx static asset serving
+React browser routing support
+Compose integration
+Unified platform startup
+Browser-accessible orchestrated runtime
+3. Why Nginx Was Introduced
+
+A key architectural decision was using:
+
+Nginx
+
+instead of:
+
+Vite dev server
+
+for production runtime.
+
+Reasoning
+
+Vite is optimized primarily for:
+
+local development
+hot reload
+development tooling
+
+Nginx provides:
+
+lightweight production serving
+efficient static asset delivery
+proper browser routing support
+deployable runtime behavior
+reverse proxy compatibility
+cloud deployment friendliness
+Important React Routing Requirement
+
+The application uses routes such as:
+
+/papers
+/interactions
+/graph
+/search
+
+Without proper Nginx configuration:
+
+browser refreshes on nested routes fail
+direct URL access breaks
+
+This was solved through:
+
+try_files $uri /index.html;
+
+which redirects unknown frontend routes back into the React application.
+
+4. Frontend Dockerfile Created
+
+File:
+
+frontend/Dockerfile
+
+Final implementation:
+
+FROM node:22-alpine AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+
+FROM nginx:alpine
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+5. Frontend Build Architecture
+
+Sprint 8B introduced a:
+
+multi-stage frontend build
+
+architecture.
+
+Stage 1 — React Build
+
+The Node.js build stage:
+
+installs dependencies
+compiles TypeScript
+runs Vite production build
+generates optimized static assets in dist/
+Stage 2 — Runtime Image
+
+The Nginx runtime stage:
+
+serves compiled frontend assets
+excludes build tooling
+minimizes runtime image size
+
+This created a significantly smaller and cleaner production image.
+
+6. nginx.conf Added
+
+File:
+
+frontend/nginx.conf
+
+Final configuration:
+
+server {
+    listen 80;
+    server_name localhost;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri /index.html;
+    }
+}
+7. Frontend .dockerignore Added
+
+File:
+
+frontend/.dockerignore
+
+Excluded:
+
+node_modules
+dist
+git metadata
+environment files
+logs
+
+Purpose:
+
+reduce Docker build context
+improve build speed
+prevent unnecessary files entering images
+8. Frontend Image Validation
+
+The frontend image was successfully built through:
+
+docker build -t biointeraction-frontend .
+Build Validation Confirmed
+
+Validated successfully:
+
+Node.js dependency installation
+TypeScript compilation
+Vite production build
+Nginx runtime assembly
+image export
+
+Important validation output:
+
+naming to docker.io/library/biointeraction-frontend
+
+This confirmed a valid deployable frontend artifact was created.
+
+9. Elasticsearch Runtime Optimization
+
+During Sprint 8B, an important infrastructure issue was addressed.
+
+Problem
+
+Elasticsearch startup behavior was:
+
+extremely heavy
+slow to initialize
+memory intensive
+
+This created:
+
+long compose startup times
+orchestration delays
+developer confusion during validation
+Root Cause
+
+Elasticsearch automatically allocates memory aggressively when JVM limits are unspecified.
+
+Solution
+
+Compose configuration updated with:
+
+ES_JAVA_OPTS=-Xms1g -Xmx1g
+
+This constrained Elasticsearch heap allocation.
+
+Result
+
+Improved:
+
+startup behavior
+memory predictability
+orchestration responsiveness
+
+while remaining sufficient for development-scale indexing workloads.
+
+10. Frontend Compose Integration
+
+The frontend was integrated into:
+
+docker-compose.yml
+
+through:
+
+frontend:
+  build:
+    context: ./frontend
+  container_name: biointeraction-frontend
+  depends_on:
+    - backend
+  ports:
+    - "3000:80"
+11. Unified Platform Runtime Achieved
+
+Sprint 8B completed the transition into:
+
+single-command platform orchestration
+
+through:
+
+docker compose up --build
+12. Final Runtime Architecture After Sprint 8B
+
+The platform architecture became:
+
+Browser
+→ Frontend container (Nginx)
+→ Backend container (Spring Boot)
+→ AI service container (FastAPI)
+→ OpenAI LLM
+→ PostgreSQL
+→ Elasticsearch
+→ Neo4j
+
+This represented the first complete:
+
+browser-accessible containerized AI scientific platform runtime
+13. Frontend Runtime Validation
+
+Validated successfully through browser access:
+
+http://localhost:3000
+Successfully Validated
+Papers Dashboard
+Paper Detail page
+Interaction dashboard
+AI-driven paper submission
+Interaction extraction persistence
+Backend API integration
+Compose service networking
+Browser-accessible runtime
+14. Most Important Architectural Transition
+
+Sprint 8B transformed the frontend from:
+
+development server runtime
+
+into:
+
+production-style deployable web runtime
+15. Productionization Implications
+
+After Sprint 8B:
+
+The platform became realistically deployable to:
+
+Google Cloud Run
+Azure Container Apps
+AWS ECS
+DigitalOcean Apps
+Kubernetes
+Docker Swarm
+
+because every major runtime component is now:
+
+containerized
+environment-driven
+orchestrated
+reproducible
+16. Major Architectural Outcomes
+Achieved
+Fully containerized platform
+Browser-accessible orchestration runtime
+Production-style frontend runtime
+Nginx static serving
+Unified Docker Compose startup
+Runtime service networking
+Production-ready frontend routing
+Deployable frontend image
+Environment-driven orchestration
+17. Remaining Future Work
+
+Still pending:
+
+Cloud deployment target selection
+Reverse proxy consolidation
+HTTPS/TLS
+Authentication & authorization
+Observability/logging
+Health checks
+CI/CD
+Secret management
+Image registry workflows
+Kubernetes manifests
+Graph semantic integrity work
+Biological relationship normalization
+Advanced interaction curation workflows
+18. Sprint 8B Final Status
+
+Sprint 8B successfully completed the platform’s transition into a:
+
+fully containerized browser-accessible scientific AI platform
+
+The project now operates as:
+
+orchestrated deployable infrastructure
+
+rather than:
+
+locally coordinated development tooling
