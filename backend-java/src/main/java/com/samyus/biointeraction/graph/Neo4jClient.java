@@ -1,17 +1,28 @@
 package com.samyus.biointeraction.graph;
 
 import org.neo4j.driver.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(
+        name = "graph.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class Neo4jClient implements AutoCloseable {
 
     private final Driver driver;
 
-    public Neo4jClient() {
+    public Neo4jClient(
+            @Value("${neo4j.uri:bolt://localhost:7687}") String uri,
+            @Value("${neo4j.username:neo4j}") String username,
+            @Value("${neo4j.password:testpassword}") String password
+    ) {
         this.driver = GraphDatabase.driver(
-                "bolt://localhost:7687",
-                AuthTokens.basic("neo4j", "testpassword")
+                uri,
+                AuthTokens.basic(username, password)
         );
     }
 

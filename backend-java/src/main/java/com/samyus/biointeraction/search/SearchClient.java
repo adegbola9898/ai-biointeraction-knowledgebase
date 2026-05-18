@@ -17,7 +17,14 @@ public class SearchClient {
     @Value("${elasticsearch.base-url:http://localhost:9200}")
     private String baseUrl;
 
+    @Value("${search.enabled:true}")
+    private boolean searchEnabled;
+
     public void indexPaper(String id, String title, String abstractText) {
+        if (!searchEnabled) {
+            return;
+        }
+
         String url = baseUrl + "/biointeraction-docs/_doc/paper-" + id;
 
         Map<String, Object> body = Map.of(
@@ -38,6 +45,10 @@ public class SearchClient {
             String evidenceText,
             String status
     ) {
+        if (!searchEnabled) {
+            return;
+        }
+
         String url = baseUrl + "/biointeraction-docs/_doc/interaction-" + id;
 
         Map<String, Object> body = Map.of(
@@ -53,7 +64,15 @@ public class SearchClient {
         sendDocument(url, body);
     }
 
-    public Map search(String query) {
+    public Map<String, Object> search(String query) {
+        if (!searchEnabled) {
+            return Map.of(
+                    "enabled", false,
+                    "message", "Search functionality is disabled",
+                    "hits", Map.of("hits", java.util.List.of())
+            );
+        }
+
         String url = baseUrl + "/biointeraction-docs/_search";
 
         Map<String, Object> body = Map.of(

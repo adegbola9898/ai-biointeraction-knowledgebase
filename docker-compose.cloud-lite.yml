@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: biointeraction-postgres-lite
+    environment:
+      POSTGRES_DB: biointeraction_db
+      POSTGRES_USER: bio_user
+      POSTGRES_PASSWORD: bio_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_lite_data:/var/lib/postgresql/data
+
+  ai-service:
+    build:
+      context: ./ai-service-python
+    container_name: biointeraction-ai-service-lite
+    env_file:
+      - ./ai-service-python/.env
+    ports:
+      - "8000:8000"
+
+  backend:
+    build:
+      context: ./backend-java
+    container_name: biointeraction-backend-lite
+    depends_on:
+      - postgres
+      - ai-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/biointeraction_db
+      SPRING_DATASOURCE_USERNAME: bio_user
+      SPRING_DATASOURCE_PASSWORD: bio_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      AI_SERVICE_BASE_URL: http://ai-service:8000
+      SEARCH_ENABLED: "false"
+      GRAPH_ENABLED: "false"
+    ports:
+      - "8081:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: biointeraction-frontend-lite
+    depends_on:
+      - backend
+    ports:
+      - "3001:80"
+
+volumes:
+  postgres_lite_data:

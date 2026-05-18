@@ -6,6 +6,8 @@ import com.samyus.biointeraction.model.Paper;
 import com.samyus.biointeraction.repository.InteractionRepository;
 import com.samyus.biointeraction.repository.PaperRepository;
 import com.samyus.biointeraction.search.SearchClient;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,18 +17,21 @@ public class InteractionService {
 
     private final InteractionRepository interactionRepository;
     private final PaperRepository paperRepository;
-    private final Neo4jClient neo4jClient;
+    private final ObjectProvider<Neo4jClient> neo4jClientProvider;
     private final SearchClient searchClient;
+
+    @Value("${graph.enabled:true}")
+    private boolean graphEnabled;
 
     public InteractionService(
             InteractionRepository interactionRepository,
             PaperRepository paperRepository,
-            Neo4jClient neo4jClient,
+            ObjectProvider<Neo4jClient> neo4jClientProvider,
             SearchClient searchClient
     ) {
         this.interactionRepository = interactionRepository;
         this.paperRepository = paperRepository;
-        this.neo4jClient = neo4jClient;
+        this.neo4jClientProvider = neo4jClientProvider;
         this.searchClient = searchClient;
     }
 
@@ -74,7 +79,8 @@ public class InteractionService {
         Interaction interaction = interactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Interaction not found"));
 
-        Interaction.Status newStatus = Interaction.Status.valueOf(status.toUpperCase());
+        Interaction.Status newStatus =
+                Interaction.Status.valueOf(status.toUpperCase());
 
         interaction.setStatus(newStatus);
 
@@ -89,7 +95,13 @@ public class InteractionService {
                 saved.getStatus().name()
         );
 
-        if (newStatus == Interaction.Status.APPROVED) {
+        Neo4jClient neo4jClient = neo4jClientProvider.getIfAvailable();
+
+        if (
+                graphEnabled &&
+                neo4jClient != null &&
+                newStatus == Interaction.Status.APPROVED
+        ) {
             neo4jClient.createInteraction(
                     saved.getProteinA(),
                     saved.getProteinB()
