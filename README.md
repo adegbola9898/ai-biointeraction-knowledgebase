@@ -1,164 +1,488 @@
 # AI-Assisted Biointeraction Knowledgebase
 
-A cloud-native bioinformatics web application for AI-assisted extraction, curation, storage, search, and exploration of molecular interaction knowledge from scientific literature.
+## Cloud-Native Scientific AI Platform for Molecular Interaction Extraction and Curation
 
-## Overview
+A production-grade bioinformatics platform for AI-assisted extraction, review, persistence, search, and exploration of biological interaction knowledge from scientific literature.
 
-This project simulates a modern biological knowledgebase platform. It supports a workflow where scientific literature is ingested, processed by an AI extraction service, stored in structured databases, reviewed through a curation workflow, and exposed through search and graph APIs.
+The platform combines:
 
-The goal is to demonstrate full-stack bioinformatics engineering using Java, Python, APIs, AI services, relational databases, graph databases, search infrastructure, and cloud-ready architecture.
+* cloud-native infrastructure
+* distributed backend services
+* LLM-powered scientific extraction
+* relational persistence
+* graph-oriented biological modeling
+* scientific review workflows
+* modern frontend engineering
 
-## Core Workflow
+into a unified scientific AI system.
+
+---
+
+# Live Platform
+
+## Public Frontend
+
+[https://biointeraction-frontend-289872008588.us-central1.run.app](https://biointeraction-frontend-289872008588.us-central1.run.app)
+
+## Public Backend API
+
+[https://biointeraction-backend-289872008588.us-central1.run.app](https://biointeraction-backend-289872008588.us-central1.run.app)
+
+## AI Extraction Service
+
+[https://biointeraction-ai-service-289872008588.us-central1.run.app](https://biointeraction-ai-service-289872008588.us-central1.run.app)
+
+---
+
+# Platform Overview
+
+The AI-Assisted Biointeraction Knowledgebase simulates a modern scientific knowledge infrastructure platform.
+
+The system enables:
+
+1. ingestion of scientific literature
+2. AI-assisted extraction of molecular interactions
+3. persistence of extracted evidence-backed relationships
+4. human review and curation workflows
+5. graph-oriented biological relationship modeling
+6. searchable interaction retrieval
+7. cloud-native deployment and orchestration
+
+The project was intentionally designed to evolve beyond a traditional bioinformatics pipeline into a distributed scientific software platform.
+
+---
+
+# Core Scientific Workflow
 
 ```text
-Paper ingestion
-        ↓
-AI-assisted interaction extraction
-        ↓
-Candidate interaction stored as PENDING
-        ↓
-Human curation: APPROVED / REJECTED
-        ↓
-Approved interaction synced to Neo4j graph
-        ↓
-Papers and interactions indexed in Elasticsearch
-Tech Stack
-Backend
-Java
-Spring Boot
-Spring Web MVC
-Spring Data JPA
-PostgreSQL
-AI Service
-Python
-FastAPI
-Uvicorn
-Databases
-PostgreSQL — transactional storage
-Neo4j — approved interaction graph
-Elasticsearch — search index
-Infrastructure
-Docker
-Docker Compose
-GitHub
-Current Features
-POST /papers — ingest paper metadata and abstract text
-GET /papers — list stored papers
-AI extraction service: POST /extract
-Automatic extraction of EGFR-GRB2 candidate interactions
-POST /interactions — manually create interaction candidates
-GET /interactions — list interactions
-PATCH /interactions/{id}/status — approve or reject interactions
-Approved interactions synced to Neo4j
-GET /graph/interactions — graph-ready nodes and edges
-GET /search?q=... — search papers and interactions via Elasticsearch
-AI service failure handling so paper ingestion still succeeds if AI is unavailable
-Repository Structure
-ai-biointeraction-knowledgebase/
-├── ai-service-python/      # FastAPI AI extraction service
-├── backend-java/           # Spring Boot backend API
-├── docs/                   # Architecture notes and rebuild log
-├── frontend/               # Future frontend application
-├── infra/                  # Future infrastructure configuration
-├── docker-compose.yml      # Local database services
-└── README.md
-Local Setup
-1. Start infrastructure services
+Scientific abstract submission
+                ↓
+Backend persistence in PostgreSQL
+                ↓
+Backend orchestration of AI extraction service
+                ↓
+LLM extraction of candidate molecular interactions
+                ↓
+Confidence scoring and evidence generation
+                ↓
+Persistence of candidate interactions as PENDING
+                ↓
+Human review and scientific validation workflow
+                ↓
+Approved interactions available for graph integration
+```
 
-From the repository root:
+---
 
-docker-compose up -d
+# Cloud Architecture
+
+```text
+Frontend (React + Vite + Nginx)
+                ↓
+Backend API (Spring Boot)
+                ↓
+AI Extraction Service (FastAPI + OpenAI)
+                ↓
+Cloud SQL PostgreSQL
+```
+
+Infrastructure components:
+
+* Google Cloud Run
+* Google Artifact Registry
+* Google Cloud SQL
+* Google Secret Manager
+* Docker
+* Docker Compose
+
+The platform currently operates in a Cloud Lite deployment mode:
+
+Enabled:
+
+* frontend
+* backend
+* AI extraction service
+* PostgreSQL persistence
+* scientific review workflow
+* LLM extraction
+
+Temporarily disabled in cloud mode:
+
+* Elasticsearch
+* Neo4j graph persistence
+
+These services remain available locally.
+
+---
+
+# Technology Stack
+
+## Frontend
+
+* React
+* TypeScript
+* Vite
+* Axios
+* Cytoscape.js
+* Nginx
+
+## Backend
+
+* Java 21
+* Spring Boot
+* Spring Web MVC
+* Spring Data JPA
+* PostgreSQL
+* HikariCP
+
+## AI Service
+
+* Python 3.12
+* FastAPI
+* Uvicorn
+* OpenAI API
+
+## Databases
+
+### PostgreSQL
+
+Transactional persistence for:
+
+* papers
+* interactions
+* review workflow state
+
+### Neo4j (local mode)
+
+Graph-oriented persistence for approved interactions.
+
+### Elasticsearch (local mode)
+
+Search indexing for papers and interactions.
+
+## Infrastructure
+
+* Docker
+* Docker Compose
+* Google Cloud Run
+* Google Artifact Registry
+* Google Cloud SQL
+* Google Secret Manager
+* GitHub
+
+---
+
+# Current Platform Features
+
+## Scientific Paper Ingestion
+
+Users can submit PubMed-style scientific abstracts through the frontend dashboard or backend API.
+
+## AI-Assisted Molecular Interaction Extraction
+
+The backend orchestrates extraction requests through a dedicated FastAPI AI service.
+
+The AI service:
+
+* analyzes scientific text
+* identifies candidate molecular interactions
+* extracts evidence text
+* assigns confidence scores
+* returns structured interaction data
+
+## Review Workflow
+
+Extracted interactions are persisted as:
+
+```text
+PENDING
+```
+
+before scientific review.
+
+This models real-world curation pipelines used in biological databases.
+
+## Interaction Persistence
+
+Validated interactions are stored in PostgreSQL.
+
+## Search Infrastructure
+
+Local mode supports Elasticsearch indexing and retrieval.
+
+## Graph Infrastructure
+
+Local mode supports Neo4j graph persistence and graph retrieval APIs.
+
+## Cloud-Native Deployment
+
+The full platform is publicly deployed on Google Cloud Run.
+
+---
+
+# Example Scientific Extraction
+
+## Input Abstract
+
+```text
+Activated EGFR recruited GRB2 and promoted downstream MAPK signaling in epithelial carcinoma cells.
+```
+
+## Example Extracted Interactions
+
+```text
+EGFR recruits GRB2
+EGFR promotes MAPK signaling
+```
+
+## Example Persisted Interaction
+
+```json
+{
+  "proteinA": "EGFR",
+  "proteinB": "GRB2",
+  "interactionType": "recruits",
+  "confidence": 0.99,
+  "extractionMethod": "LLM",
+  "status": "PENDING"
+}
+```
+
+---
+
+# API Overview
+
+## Health
+
+```http
+GET /health
+```
+
+## Papers
+
+```http
+POST /papers
+GET /papers
+```
+
+## Interactions
+
+```http
+GET /interactions
+POST /interactions
+PATCH /interactions/{id}/status
+GET /interactions/paper/{paperId}
+```
+
+## Search
+
+```http
+GET /search?q=EGFR
+```
+
+## Graph
+
+```http
+GET /graph/interactions
+```
+
+---
+
+# Local Development
+
+## Clone Repository
+
+```bash
+git clone https://github.com/adegbola9898/ai-biointeraction-knowledgebase.git
+cd ai-biointeraction-knowledgebase
+```
+
+---
+
+## Start Infrastructure
+
+```bash
+docker compose up -d
+```
 
 This starts:
 
-PostgreSQL on port 5432
-Neo4j on port 7474 and 7687
-Elasticsearch on port 9200
+* PostgreSQL
+* Neo4j
+* Elasticsearch
 
-Verify Elasticsearch:
+---
 
-curl http://localhost:9200
+## Start AI Service
 
-Verify Neo4j in browser:
-
-http://localhost:7474
-
-Neo4j credentials:
-
-username: neo4j
-password: testpassword
-2. Run AI extraction service
+```bash
 cd ai-service-python
 source .venv/bin/activate
 uvicorn app.main:app --reload --port 8000
+```
 
-Test:
+---
 
-curl -X POST http://localhost:8000/extract \
--H "Content-Type: application/json" \
--d '{"text": "EGFR interacts with GRB2"}'
-3. Run Java backend
+## Start Backend
 
-Open another terminal:
-
+```bash
 cd backend-java
 ./mvnw spring-boot:run
+```
 
-Health check:
+---
 
-curl http://localhost:8080/health
-Example API Usage
-Create a paper
-curl -X POST http://localhost:8080/papers \
--H "Content-Type: application/json" \
--d '{"title": "EGFR signaling", "abstractText": "EGFR interacts with GRB2 in signaling"}'
+## Start Frontend
 
-This stores the paper, calls the AI service, creates a pending interaction, and indexes documents in Elasticsearch.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-List interactions
-curl http://localhost:8080/interactions
-Approve an interaction
-curl -X PATCH http://localhost:8080/interactions/INTERACTION_ID/status \
--H "Content-Type: application/json" \
--d '{"status": "APPROVED"}'
+---
 
-Approving an interaction updates PostgreSQL and writes the protein relationship to Neo4j.
+# Cloud Deployment
 
-Get graph data
-curl http://localhost:8080/graph/interactions
+The production platform is deployed on Google Cloud Run.
 
-Example response:
+Deployment includes:
 
-{
-  "nodes": [
-    {"id": "EGFR", "label": "EGFR"},
-    {"id": "GRB2", "label": "GRB2"}
-  ],
-  "edges": [
-    {"source": "EGFR", "target": "GRB2", "type": "INTERACTS_WITH"}
-  ]
-}
-Search
-curl "http://localhost:8080/search?q=EGFR"
+* containerized frontend
+* containerized backend
+* containerized AI extraction service
+* managed PostgreSQL persistence
+* cloud secret management
+* artifact registry image hosting
 
-Returns matching papers and interactions from Elasticsearch.
+Key engineering challenges solved:
 
-Architecture Summary
+* Cloud SQL connectivity from Spring Boot
+* Cloud Run port configuration
+* build-time frontend environment configuration
+* CORS handling across distributed services
+* serverless database connection management
+* secret injection through Secret Manager
 
-The system uses Spring Boot as the central orchestration layer. Paper ingestion is handled by the backend, which calls the FastAPI AI service for candidate interaction extraction. PostgreSQL stores core transactional records. Approved interactions are synced to Neo4j for graph representation, while papers and interactions are indexed in Elasticsearch for search.
+---
 
-Current Limitations
-AI extraction is currently rule-based and mocked
-Search responses return raw Elasticsearch output
-Error handling needs structured API responses
-No frontend dashboard yet
-No authentication yet
-Redis caching not yet implemented
-Next Steps
-Add Redis caching for frequent queries
-Build frontend curation dashboard
-Add cleaner response DTOs
-Add custom exception handling
-Add OpenAPI/Swagger documentation
-Containerise backend and AI service
-Deploy to Google Cloud
+# Repository Structure
+
+```text
+ai-biointeraction-knowledgebase/
+├── ai-service-python/      # FastAPI AI extraction service
+├── backend-java/           # Spring Boot backend API
+├── deployment/             # Cloud deployment configuration
+├── docs/                   # Sprint manuals and architecture docs
+├── frontend/               # React frontend dashboard
+├── infra/                  # Future infrastructure configuration
+├── docker-compose.yml
+├── docker-compose.cloud-lite.yml
+└── README.md
+```
+
+---
+
+# Scientific Goals
+
+The platform aims to evolve toward:
+
+* biological knowledge graph construction
+* automated literature mining
+* evidence-backed molecular interaction curation
+* ontology-aware biological normalization
+* reviewer-assisted scientific validation workflows
+* scalable biological relationship exploration
+
+Potential future domains include:
+
+* oncology signaling networks
+* transcriptomic biomarker discovery
+* pathogen-host interactions
+* One Health genomic surveillance
+* metagenomic knowledge integration
+
+---
+
+# Engineering Roadmap
+
+## Platform Infrastructure
+
+* CI/CD pipelines
+* Infrastructure as Code
+* autoscaling policy tuning
+* observability stack
+* cost monitoring
+* automated backups
+
+## Security
+
+* authentication and authorization
+* reviewer role management
+* audit logging
+* custom domains and HTTPS hardening
+
+## AI Workflow Evolution
+
+* async extraction queues
+* batch paper ingestion
+* PubMed integration
+* evidence ranking
+* citation tracing
+* ontology normalization
+* biological entity disambiguation
+
+## Search and Graph Expansion
+
+* managed Elasticsearch/OpenSearch
+* managed Neo4j deployment
+* graph visualization enhancements
+* semantic search
+* embedding-based retrieval
+
+---
+
+# Lessons Learned
+
+The project evolved from a local prototype into a distributed cloud-native scientific AI platform.
+
+Major engineering lessons included:
+
+* distributed service orchestration
+* cloud-native deployment strategy
+* Docker multi-stage builds
+* Cloud Run deployment architecture
+* frontend build-time environment injection
+* serverless database scaling behavior
+* production CORS configuration
+* AI service decomposition
+* scientific workflow modeling
+* production-grade infrastructure debugging
+
+---
+
+# Final Status
+
+The platform is now capable of:
+
+* real-time scientific abstract ingestion
+* live LLM-driven molecular interaction extraction
+* persistent cloud-hosted storage
+* frontend interaction review workflows
+* distributed service orchestration
+* public cloud deployment
+
+This project demonstrates the intersection of:
+
+* bioinformatics
+* scientific software engineering
+* cloud infrastructure
+* AI systems engineering
+* distributed backend architecture
+* knowledgebase platform design
+
+---
+
+# License
+
+MIT License
