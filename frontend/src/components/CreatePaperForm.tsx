@@ -13,7 +13,6 @@ export default function CreatePaperForm({ onPaperCreated }: CreatePaperFormProps
   const [abstractText, setAbstractText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  //const [successMessage, setSuccessMessage] = useState("");
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
